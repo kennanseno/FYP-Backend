@@ -1,0 +1,20 @@
+{
+  "name": "fyp-project",
+  "version": "1.0.0",
+  "description": "FYP project",
+  "main": "index.js",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "mongodb": "^2.2.11"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "forever start index.js",
+    "stop": "forever stop index.js",
+    "restart": "forever restart index.js",
+    "startmongo": "scripts/start-mongo.js"
+  },
+  "author": "Kennan Lyle Seno",
+  "license": "ISC"
+}
