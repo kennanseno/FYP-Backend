@@ -27,6 +27,18 @@ MongoClient.connect(mongoUrl, function(err, db) {
 	});
 });
 
+app.get(path + '/findUser', function(req, res) {
+	var data = {
+		username: req.query.username,
+		password: req.query.password
+	}
+
+	console.log('params: ', data);
+	findDocuments(database, data, function(docs) {
+		res.send(docs);
+		console.log(docs);	
+	});
+});
 
 
 
@@ -56,7 +68,8 @@ app.get(path + '/test/removeTestUser', function(req, res) {
 });
 
 app.get(path + '/test/find', function(req, res) {
-	findDocuments(database, function(docs) {
+	var data = {}
+	findDocuments(database, data, function(docs) {
 		res.send(docs);
 	});
 });
@@ -79,16 +92,17 @@ var removeDocument = function(db, data, callback) {
 	var collection = db.collection(collectionUsed);
 
 	collection.remove(data, function(err, result) {
-		//assert.equal(err, null);
+		assert.equal(err, null);
 		callback(result);
 	});
 }
 
-var findDocuments = function(db, callback) {
+var findDocuments = function(db, data, callback) {
 	var collection = db.collection(collectionUsed);
 	
-	collection.find({}).toArray(function(err, docs) {
+	collection.find(data).toArray(function(err, docs) {
 		assert.equal(err, null);
+		console.log(docs.length + ' Documents found!');
 		callback(docs);
 	});
 }
