@@ -7,10 +7,16 @@ var assert = require('assert');
 app.use(bodyParser());
 app.use(express.static('public'));
 
-var url = 'mongodb://localhost:3001/FYP';
-var database;
+var mongoUrl = 'mongodb://localhost:3001/FYP',
+	path = '/fyp',
+	database,
+	TEST_COLLECTION = 'TESTCOLLECTION',
+	PROD_COLLECTION = 'production';
 
-MongoClient.connect(url, function(err, db) {
+var DEV_MODE = true;
+var collectionUsed = DEV_MODE ? TEST_COLLECTION : PROD_COLLECTION;
+
+MongoClient.connect(mongoUrl, function(err, db) {
 	if(err) {
 		return console.log(err);
 	}
@@ -21,39 +27,68 @@ MongoClient.connect(url, function(err, db) {
 	});
 });
 
-app.get('/test', function(req, res) {
-	console.log('HELLO');
-	var collection = database.collection('testCollection');
 
-	collection.find({}).toArray(function(error, documents) {
-		if(error) throw error;
 
-		res.send(documents);
+
+
+
+
+
+/*
+		TEST CODES
+*/
+
+app.get(path + '/test/insertTestUser', function(req, res) {
+	var testUser = {username: 'test', password: 'test'};
+
+	insertDocument(database, testUser, function(result) {
+		res.send('Test user Added!');
 	});
 });
 
+app.get(path + '/test/removeTestUser', function(req, res) {
+	var testUser = {username: 'test', password: 'test'};
 
-var insertDocuments = function(db, callback) {
-	var collection = db.collection('testCollection');
+	removeDocument(database, testUser, function(result) {
+		res.send(result);
+	});
 
-	collection.insertMany([
-		{a: 1}, {a : 2}, {a: 3}
-	], function(err, result) {
+});
+
+app.get(path + '/test/find', function(req, res) {
+	findDocuments(database, function(docs) {
+		res.send(docs);
+	});
+});
+
+/* 
+	UTIL FUNCTIONS
+*/
+
+
+var insertDocument = function(db, data, callback) {
+	var collection = db.collection(collectionUsed);
+
+	collection.insert([data], function(err, result) {
 		assert.equal(err, null);
-		assert.equal(3, result.result.n);
-		assert.equal(3, result.ops.length);
-		console.log("Inserted 3 documents into the document collection");
+		callback(result);
+	});
+}
+
+var removeDocument = function(db, data, callback) {
+	var collection = db.collection(collectionUsed);
+
+	collection.remove(data, function(err, result) {
+		//assert.equal(err, null);
 		callback(result);
 	});
 }
 
 var findDocuments = function(db, callback) {
-	var collection = db.collection('testCollection');
+	var collection = db.collection(collectionUsed);
 	
 	collection.find({}).toArray(function(err, docs) {
 		assert.equal(err, null);
-		console.log("Found the following records");
-		console.dir(docs);
 		callback(docs);
 	});
 }
