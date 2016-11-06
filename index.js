@@ -40,11 +40,18 @@ app.get(path + '/findUser', function(req, res) {
 	});
 });
 
+app.get(path + '/registerUser', function(req, res) {
+	var data = {
+		username: req.query.username,
+		email: req.query.email,
+		password: req.query.password
+	};
 
-
-
-
-
+	insertDocument(database, data, function(result) {
+		console.log('New User added!');
+		res.send(result.result);
+	});
+});
 
 /*
 		TEST CODES
@@ -73,6 +80,15 @@ app.get(path + '/test/find', function(req, res) {
 		res.send(docs);
 	});
 });
+
+app.get(path + '/test/removeAllUsers', function(req, res) {
+	var data = {}
+	removeDocument(database, data, function(docs) {
+		res.send('All users deleted!');
+		console.log('All users deleted!');
+	});
+});
+
 
 /* 
 	UTIL FUNCTIONS
