@@ -13,6 +13,7 @@ var mongoUrl = 'mongodb://localhost:3001/FYP',
 	TEST_COLLECTION = 'TESTCOLLECTION',
 	PROD_COLLECTION = 'production';
 
+//IF ON DEV MODE
 var DEV_MODE = true;
 var collectionUsed = DEV_MODE ? TEST_COLLECTION : PROD_COLLECTION;
 
@@ -58,7 +59,7 @@ app.get(path + '/registerUser', function(req, res) {
 */
 
 app.get(path + '/test/insertTestUser', function(req, res) {
-	var testUser = {username: 'test', password: 'test'};
+	var testUser = {username: 'test', password: 'test', stores: []};
 
 	insertDocument(database, testUser, function(result) {
 		res.send('Test user Added!');
