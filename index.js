@@ -45,7 +45,9 @@ app.get(path + '/registerUser', function(req, res) {
 	var data = {
 		username: req.query.username,
 		email: req.query.email,
-		password: req.query.password
+		password: req.query.password,
+		name: req.query.name,
+		address: req.query.address
 	};
 
 	insertDocument(database, data, function(result) {
@@ -59,7 +61,7 @@ app.get(path + '/registerUser', function(req, res) {
 */
 
 app.get(path + '/test/insertTestUser', function(req, res) {
-	var testUser = {username: 'test', password: 'test', stores: []};
+	var testUser = {username: 'test', email: 'test@test.com', password: 'test', name: 'Test Test', address: '25 test St., Test', stores: []};
 
 	insertDocument(database, testUser, function(result) {
 		res.send('Test user Added!');
