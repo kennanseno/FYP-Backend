@@ -119,7 +119,7 @@ var removeDocument = function(db, data, callback) {
 var findDocuments = function(db, data, callback) {
 	var collection = db.collection(collectionUsed);
 	
-	collection.find(data).toArray(function(err, docs) {
+	collection.find(data, {password: false}).toArray(function(err, docs) {
 		assert.equal(err, null);
 		console.log(docs.length + ' Documents found!');
 		callback(docs);
