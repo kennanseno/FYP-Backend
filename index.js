@@ -61,7 +61,17 @@ app.get(path + '/registerUser', function(req, res) {
 */
 
 app.get(path + '/test/insertTestUser', function(req, res) {
-	var testUser = {username: 'test', email: 'test@test.com', password: 'test', name: 'Test Test', address: '25 test St., Test', stores: []};
+	var testUser = {
+		username: 'test',
+		email: 'test@test.com',
+		password: 'test',
+		name: 'Test Test',
+		address: '25 test St., Test',
+		stores: [
+			'Store 1',
+			'Store 2'
+		]
+	};
 
 	insertDocument(database, testUser, function(result) {
 		res.send('Test user Added!');
