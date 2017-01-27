@@ -31,10 +31,10 @@ MongoClient.connect(mongoUrl, function(err, db) {
 
 app.get(path + '/findUser', function(req, res) {
 	var config = req.query.queryParams,
-		data = {
-			username: req.query.username,
-			password: req.query.password
-	};
+            data = {};
+	
+	if(_.isString(req.query.username)) data.username = req.query.username;
+	if(_.isString(req.query.password)) data.password = req.query.password;
 
 	//returns only requested data
 	var params = {};
@@ -47,7 +47,6 @@ app.get(path + '/findUser', function(req, res) {
 
 	}
 
-	console.log('params: ', params);
 	findDocuments(database, data, params, function(docs) {
 		res.send(docs);
 		console.log(docs);	
