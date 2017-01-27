@@ -1,4 +1,5 @@
 var express = require('express');
+var _ = require('lodash');
 var app = express();
 var bodyParser = require('body-parser');
 var MongoClient = require('mongodb').MongoClient;
@@ -37,13 +38,14 @@ app.get(path + '/findUser', function(req, res) {
 
 	//returns only requested data
 	var params = {};
-	if(config) {
+	if(_.isString(config)) {
+		params[config] = true;
+	} else if(_.isObject(config)) {
 		for(var index = 0; index < config.length; index++){
 			params[config[index]] = true;
 		}
 
 	}
-
 
 	console.log('params: ', params);
 	findDocuments(database, data, params, function(docs) {
