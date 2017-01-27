@@ -36,7 +36,9 @@ app.get(path + '/findUser', function(req, res) {
 	};
 
 	//returns only requested data
-	var params = {};
+	var params = {
+		password: false
+	};
 	if(config) {
 		for(var index = 0; index < config.length; index++){
 			params[config[index]] = true;
