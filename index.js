@@ -38,9 +38,10 @@ app.get(path + '/findUser', function(req, res) {
 	//returns only requested data
 	var params = {};
 	if(config) {
-		config.forEach(function(value) {
-			params[value] = true;
-		});
+		for(var index = 0; index < config.length; index++){
+			params[config[index]] = true;
+		}
+
 	}
 
 
@@ -99,7 +100,9 @@ app.get(path + '/test/removeTestUser', function(req, res) {
 
 app.get(path + '/test/find', function(req, res) {
 	var data = {},
-		params = {};
+		params = {
+			password: false
+		};
 
 	findDocuments(database, data, params, function(docs) {
 		res.send(docs);
