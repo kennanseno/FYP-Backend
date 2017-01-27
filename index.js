@@ -29,13 +29,23 @@ MongoClient.connect(mongoUrl, function(err, db) {
 });
 
 app.get(path + '/findUser', function(req, res) {
-	var data = {
-		username: req.query.username,
-		password: req.query.password
+	var config = req.query.queryParams,
+		data = {
+			username: req.query.username,
+			password: req.query.password
+	};
+
+	//returns only requested data
+	var params = {};
+	if(config) {
+		config.forEach(function(value) {
+			params[value] = true;
+		});
 	}
 
+
 	console.log('params: ', data);
-	findDocuments(database, data, function(docs) {
+	findDocuments(database, data, params, function(docs) {
 		res.send(docs);
 		console.log(docs);	
 	});
@@ -88,8 +98,10 @@ app.get(path + '/test/removeTestUser', function(req, res) {
 });
 
 app.get(path + '/test/find', function(req, res) {
-	var data = {}
-	findDocuments(database, data, function(docs) {
+	var data = {},
+		params = {};
+
+	findDocuments(database, data, params, function(docs) {
 		res.send(docs);
 	});
 });
@@ -126,10 +138,10 @@ var removeDocument = function(db, data, callback) {
 	});
 }
 
-var findDocuments = function(db, data, callback) {
+var findDocuments = function(db, data, config, callback) {
 	var collection = db.collection(collectionUsed);
 	
-	collection.find(data, {password: false}).toArray(function(err, docs) {
+	collection.find(data, config).toArray(function(err, docs) {
 		assert.equal(err, null);
 		console.log(docs.length + ' Documents found!');
 		callback(docs);
