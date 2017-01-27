@@ -36,9 +36,7 @@ app.get(path + '/findUser', function(req, res) {
 	};
 
 	//returns only requested data
-	var params = {
-		password: false
-	};
+	var params = {};
 	if(config) {
 		for(var index = 0; index < config.length; index++){
 			params[config[index]] = true;
@@ -47,7 +45,7 @@ app.get(path + '/findUser', function(req, res) {
 	}
 
 
-	console.log('params: ', data);
+	console.log('params: ', params);
 	findDocuments(database, data, params, function(docs) {
 		res.send(docs);
 		console.log(docs);	
