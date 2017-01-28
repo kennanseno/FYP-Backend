@@ -73,9 +73,11 @@ app.post(path + '/createStore', function(req, res) {
 			$push: { stores: req.body.data }
 		};
 	
+	console.log(params);
 	console.log(JSON.stringify(params));
+	console.log(data);
 	console.log(JSON.stringify(data));
-	updateDocuments(database, data, params, function(result) {
+	updateDocuments(database, params, data, function(result) {
 		res.send(result.result)
 	});
 });
@@ -178,10 +180,10 @@ var findDocuments = function(db, data, params, callback) {
 	});
 }
 
-var updateDocuments = function(db, data, params, callback) {
+var updateDocuments = function(db, params, data, callback) {
 	var collection = db.collection(collectionUsed);
 
-	collection.update(data, params, function(err, result) {
+	collection.update(params, data, function(err, result) {
 		assert.equal(err, null);
 		callback(result);
 	});
