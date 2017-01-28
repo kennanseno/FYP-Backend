@@ -69,12 +69,14 @@ app.get(path + '/registerUser', function(req, res) {
 });
 
 app.post(path + '/createStore', function(req, res) {
-	var data = req.body.data,
-		params = req.body.params;
-
-		updateDocuments(database, data, params, function(result) {
-			res.send(result.result)
-		});
+	var params = req.body.params,
+		data = { 
+			$push: { stores: req.body.params}
+		};
+	
+	updateDocuments(database, data, params, function(result) {
+		res.send(result.result)
+	});
 });
 
 app.get(path + '/removeUser', function(req, res) {
