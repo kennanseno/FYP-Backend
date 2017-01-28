@@ -80,8 +80,18 @@ app.get(path + '/test/insertTestUser', function(req, res) {
 		name: 'Test Test',
 		address: '25 test St., Test',
 		stores: [
-			'Store 1',
-			'Store 2'
+			{
+				name: 'Store 1',
+				description: 'Most awesome store!',
+				address: '25 millstead',
+				products: []
+			},
+			{
+				name: 'Store 2',
+				description: 'Most awesome store!',
+				address: '25 millstead',
+				products: []
+			}
 		]
 	};
 
