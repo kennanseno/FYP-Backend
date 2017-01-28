@@ -70,7 +70,7 @@ app.get(path + '/registerUser', function(req, res) {
 app.post(path + '/createStore', function(req, res) {
 	var params = req.body.params,
 		data = { 
-			$push: { stores: req.body.params }
+			$push: { stores: req.body.data }
 		};
 	
 	console.log(JSON.stringify(params));
