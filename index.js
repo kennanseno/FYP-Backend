@@ -69,15 +69,12 @@ app.get(path + '/registerUser', function(req, res) {
 });
 
 app.post(path + '/createStore', function(req, res) {
-	var data = {
-		name: req.query.name,
-		description: req.query.description,
-		address: req.query.address
-	};
+	var data = req.body.data,
+		params = req.body.params;
 
-	console.log('request: ' + req);
-	console.log('request-body: ' + req.body);
-	console.log('request-data: ' + data);
+		updateDocuments(database, data, params, function(result) {
+			res.send(result.result)
+		});
 });
 
 app.get(path + '/removeUser', function(req, res) {
