@@ -14,8 +14,7 @@ var mongoUrl = 'mongodb://localhost:3001/FYP',
 	TEST_COLLECTION = 'TESTCOLLECTION',
 	PROD_COLLECTION = 'production';
 
-//IF ON DEV MODE
-var DEV_MODE = true;
+var DEV_MODE = true; //IF ON DEV PHASE
 var collectionUsed = DEV_MODE ? TEST_COLLECTION : PROD_COLLECTION;
 
 MongoClient.connect(mongoUrl, function(err, db) {
@@ -69,9 +68,29 @@ app.get(path + '/registerUser', function(req, res) {
 	});
 });
 
-/*
-		TEST CODES
-*/
+app.post(path + '/createStore', function(req, res) {
+	var data = {
+		name: req.query.name,
+		description: req.query.description,
+		address: req.query.address
+	};
+
+	console.log('request: ' + req);
+	console.log('request-body: ' + req.body);
+	console.log('request-data: ' + data);
+});
+
+app.get(path + '/removeUser', function(req, res) {
+	var data = {
+		username: req.query.username
+	};
+
+	removeDocument(database, data, function(result) {
+		res.send(data.username + ' successfully removed!');
+	});
+});
+
+/* ------------ TEST CODE -------------------- */
 
 app.get(path + '/test/insertTestUser', function(req, res) {
 	var testUser = {
@@ -129,11 +148,7 @@ app.get(path + '/test/removeAllUsers', function(req, res) {
 	});
 });
 
-
-/* 
-	UTIL FUNCTIONS
-*/
-
+/* ------------ UTIL FUNCTIONS ------------- */
 
 var insertDocument = function(db, data, callback) {
 	var collection = db.collection(collectionUsed);
@@ -153,12 +168,21 @@ var removeDocument = function(db, data, callback) {
 	});
 }
 
-var findDocuments = function(db, data, config, callback) {
+var findDocuments = function(db, data, params, callback) {
 	var collection = db.collection(collectionUsed);
 	
-	collection.find(data, config).toArray(function(err, docs) {
+	collection.find(data, params).toArray(function(err, docs) {
 		assert.equal(err, null);
 		console.log(docs.length + ' Documents found!');
 		callback(docs);
+	});
+}
+
+var updateDocuments = function(db, data, params, callback) {
+	var collection = db.collection(collectionUsed);
+
+	collection.update(data, params, function(err, result) {
+		assert.equal(err, null);
+		callback(result);
 	});
 }
