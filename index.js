@@ -47,8 +47,7 @@ app.get(path + '/findUser', function(req, res) {
 	}
 
 	findDocuments(database, data, params, function(docs) {
-		res.send(docs);
-		console.log(docs);	
+		res.send(docs);	
 	});
 });
 
@@ -71,9 +70,11 @@ app.get(path + '/registerUser', function(req, res) {
 app.post(path + '/createStore', function(req, res) {
 	var params = req.body.params,
 		data = { 
-			$push: { stores: req.body.params}
+			$push: { stores: req.body.params }
 		};
 	
+	console.log(JSON.stringify(params));
+	console.log(JSON.stringify(data));
 	updateDocuments(database, data, params, function(result) {
 		res.send(result.result)
 	});
