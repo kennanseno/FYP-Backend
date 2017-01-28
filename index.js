@@ -59,7 +59,8 @@ app.get(path + '/registerUser', function(req, res) {
 		email: req.query.email,
 		password: req.query.password,
 		name: req.query.name,
-		address: req.query.address
+		address: req.query.address,
+		stores: []
 	};
 
 	insertDocument(database, data, function(result) {
