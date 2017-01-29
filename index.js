@@ -52,27 +52,16 @@ app.get(path + '/findUser', function(req, res) {
 });
 
 app.get(path + '/getProducts', function(req, res) {
-	var config = req.query.queryParams,
-        data = {
-			username: req.query.username,
-			'stores.name': req.query.storename
-		};
+	var params = [
+		{ $match: req.query.username },
+		{ $match: req.query.storename },
+	];
 
-	//returns only requested data
-	var params = {};
-	if(_.isString(config)) {
-		params[config] = true;
-	} else if(_.isObject(config)) {
-		for(var index = 0; index < config.length; index++){
-			params[config[index]] = true;
-		}
 
-	}
-
-	console.log('data: ', data);
 	console.log('params: ', params);
-	findDocuments(database, data, params, function(docs) {
-		res.send(docs);	
+	aggregate(params, function(docs) {
+		console.log(docs);
+		//res.send(docs);	
 	});
 });
 
@@ -218,6 +207,15 @@ var updateDocuments = function(db, params, data, callback) {
 	var collection = db.collection(collectionUsed);
 
 	collection.update(params, data, function(err, result) {
+		assert.equal(err, null);
+		callback(result);
+	});
+}
+
+var aggregate = function(db, params, callback) {
+	var collection = db.collection(collectionUsed);
+
+	collection.aggregate(params, function(err, result) {
 		assert.equal(err, null);
 		callback(result);
 	});
