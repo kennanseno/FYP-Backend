@@ -68,15 +68,12 @@ app.get(path + '/registerUser', function(req, res) {
 });
 
 app.post(path + '/createStore', function(req, res) {
+	req.body.data.products = []; // inject empty product array
 	var params = req.body.params,
 		data = { 
 			$push: { stores: req.body.data }
 		};
 	
-	console.log(params);
-	console.log(JSON.stringify(params));
-	console.log(data);
-	console.log(JSON.stringify(data));
 	updateDocuments(database, params, data, function(result) {
 		res.send(result.result)
 	});
