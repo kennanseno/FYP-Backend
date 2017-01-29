@@ -55,15 +55,12 @@ app.get(path + '/getProducts', function(req, res) {
 	var params = [
 		{ $match: {'username': req.query.username} },
 		{ $unwind: '$stores' },
-		{ $match: {'store.name': req.query.storename} },
+		{ $match: {'stores.name': req.query.storename} },
 		{ $project: {'products': '$stores.products'} }
 	];
 
-
-	console.log('params: ', params);
-	aggregate(params, function(docs) {
-		console.log(docs);
-		//res.send(docs);	
+	aggregate(database, params, function(docs) {
+		res.send(docs);	
 	});
 });
 
