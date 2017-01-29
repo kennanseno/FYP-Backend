@@ -82,10 +82,9 @@ app.post(path + '/createStore', function(req, res) {
 app.post(path + '/addProduct', function(req, res) {
 	var params = req.body.params,
 		data = { 
-			$push: { 'stores.product' : req.body.data }
+			$push: { 'stores.$.products' : req.body.data }
 		};
-	
-	console.log('Data: ', data)
+
 	updateDocuments(database, params, data, function(result) {
 		res.send(result.result)
 	});
