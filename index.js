@@ -79,6 +79,18 @@ app.post(path + '/createStore', function(req, res) {
 	});
 });
 
+app.post(path + '/addProduct', function(req, res) {
+	var params = req.body.params,
+		data = { 
+			$push: { 'stores.product' : req.body.data }
+		};
+	
+	console.log('Data: ', data)
+	updateDocuments(database, params, data, function(result) {
+		res.send(result.result)
+	});
+});
+
 app.get(path + '/removeUser', function(req, res) {
 	var data = {
 		username: req.query.username
