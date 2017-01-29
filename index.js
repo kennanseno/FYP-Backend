@@ -51,6 +51,32 @@ app.get(path + '/findUser', function(req, res) {
 	});
 });
 
+app.get(path + '/getProducts', function(req, res) {
+	var config = req.query.queryParams,
+        data = {
+			username: req.query.username,
+			'stores.name': req.query.storename
+		};
+
+	//returns only requested data
+	var params = {};
+	if(_.isString(config)) {
+		params[config] = true;
+	} else if(_.isObject(config)) {
+		for(var index = 0; index < config.length; index++){
+			params[config[index]] = true;
+		}
+
+	}
+
+	console.log('data: ', data);
+	console.log('params: ', params);
+	findDocuments(database, data, params, function(docs) {
+		res.send(docs);	
+	});
+});
+
+
 app.get(path + '/registerUser', function(req, res) {
 	var data = {
 		username: req.query.username,
