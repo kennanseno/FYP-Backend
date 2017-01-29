@@ -29,22 +29,31 @@ MongoClient.connect(mongoUrl, function(err, db) {
 });
 
 app.get(path + '/findUser', function(req, res) {
-	var config = req.query.queryParams,
-            data = {};
+	var data = {
+		username: req.query.username,
+		password: req.query.password
+	};
 	
-	if(_.isString(req.query.username)) data.username = req.query.username;
-	if(_.isString(req.query.password)) data.password = req.query.password;
+	var params = {
+		username: true,
+		email: true,
+		name: true,
+		address: true
+	};
 
-	//returns only requested data
-	var params = {};
-	if(_.isString(config)) {
-		params[config] = true;
-	} else if(_.isObject(config)) {
-		for(var index = 0; index < config.length; index++){
-			params[config[index]] = true;
-		}
+	findDocuments(database, data, params, function(docs) {
+		res.send(docs);	
+	});
+});
 
-	}
+app.get(path + '/getStore', function(req, res) {
+	var data = {
+		username: req.query.username
+	};
+	
+	var params = {
+		stores: true
+	};
 
 	findDocuments(database, data, params, function(docs) {
 		res.send(docs);	
