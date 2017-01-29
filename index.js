@@ -53,8 +53,10 @@ app.get(path + '/findUser', function(req, res) {
 
 app.get(path + '/getProducts', function(req, res) {
 	var params = [
-		{ $match: req.query.username },
-		{ $match: req.query.storename },
+		{ $match: {'username': req.query.username} },
+		{ $unwind: '$stores' },
+		{ $match: {'store.name': req.query.storename} },
+		{ $project: {'products': '$stores.products'} }
 	];
 
 
