@@ -113,6 +113,20 @@ app.post(path + '/addProduct', function(req, res) {
 	});
 });
 
+app.post(path + '/addPaymentMethod', function(req, res) {
+	var params = {
+		username: req.body.params.username,
+		'stores.name': req.body.params.storename
+	},
+	data = { 
+		$push: { 'stores.$.paymentMethod' : req.body.data }
+	};
+
+	updateDocuments(database, params, data, function(result) {
+		res.send(result.result)
+	});
+});
+
 app.get(path + '/removeUser', function(req, res) {
 	var data = {
 		username: req.query.username
