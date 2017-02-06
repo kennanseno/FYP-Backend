@@ -91,6 +91,7 @@ app.get(path + '/registerUser', function(req, res) {
 });
 
 app.post(path + '/createStore', function(req, res) {
+	req.body.data.paymentMethod = ''; //inject empty paymentMethod array
 	req.body.data.products = []; // inject empty product array
 	var params = req.body.params,
 		data = { 
@@ -137,6 +138,13 @@ app.get(path + '/test/insertTestUser', function(req, res) {
 				name: 'Store 1',
 				description: 'Most awesome store!',
 				address: '25 millstead',
+				paymentMethod: [
+					{
+						_id: 'SIMPLIFY',
+						publicKey: 'sbpb_MmVmOGUyNDgtNThjYy00MTZhLWI4YTMtNTIzMDVkZGE5Mjlh',
+						privateKey: 'Tw5A8JfQwsAk8b8KrohVCeBNLEWQR2QO4eq6AudJx295YFFQL0ODSXAOkNtXTToq' 
+					}
+				],
 				products: []
 			},
 			{
