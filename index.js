@@ -75,12 +75,12 @@ app.get(path + '/getStoreDetails', function(req, res) {
 });
 
 
-app.get(path + '/registerUser', function(req, res) {
+app.post(path + '/registerUser', function(req, res) {
 	var data = {
-		username: req.query.username,
-		email: req.query.email,
-		password: req.query.password,
-		name: req.query.name,
+		username: req.body.username,
+		email: req.body.email,
+		password: req.body.password,
+		name: req.body.name,
 		address: req.query.address,
 		stores: []
 	};
