@@ -114,14 +114,13 @@ app.post(path + '/addProduct', function(req, res) {
 });
 
 app.post(path + '/addPaymentMethod', function(req, res) {
-	var params = {
-		username: req.body.params.username,
-		'stores.name': req.body.params.storename
-	},
+	var params = req.body.params,
 	data = { 
 		$push: { 'stores.$.paymentMethod' : req.body.data }
 	};
 
+	console.log('params:', params);
+	console.log('data:', data);
 	updateDocuments(database, params, data, function(result) {
 		res.send(result.result)
 	});
