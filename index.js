@@ -60,12 +60,13 @@ app.get(path + '/getStore', function(req, res) {
 	});
 });
 
-app.get(path + '/getProducts', function(req, res) {
+// Gets store products and payment method
+app.get(path + '/getStoreDetails', function(req, res) {
 	var params = [
 		{ $match: {'username': req.query.username} },
 		{ $unwind: '$stores' },
 		{ $match: {'stores.name': req.query.storename} },
-		{ $project: {'products': '$stores.products'} }
+		{ $project: {'products': '$stores.products', 'paymentMethod': '$stores.paymentMethod._id'} }
 	];
 
 	aggregate(database, params, function(docs) {
