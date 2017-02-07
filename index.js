@@ -116,11 +116,9 @@ app.post(path + '/addProduct', function(req, res) {
 app.post(path + '/addPaymentMethod', function(req, res) {
 	var params = req.body.params,
 	data = { 
-		$push: { 'stores.$.paymentMethod' : req.body.data }
+		$set: { 'stores.$.paymentMethod' : req.body.data }
 	};
 
-	console.log('params:', params);
-	console.log('data:', data);
 	updateDocuments(database, params, data, function(result) {
 		res.send(result.result)
 	});
@@ -153,8 +151,7 @@ app.get(path + '/test/insertTestUser', function(req, res) {
 				paymentMethod: 
 					{
 						_id: 'SIMPLIFY',
-						publicKey: 'sbpb_MmVmOGUyNDgtNThjYy00MTZhLWI4YTMtNTIzMDVkZGE5Mjlh',
-						privateKey: 'Tw5A8JfQwsAk8b8KrohVCeBNLEWQR2QO4eq6AudJx295YFFQL0ODSXAOkNtXTToq' 
+						publicKey: 'sbpb_MmVmOGUyNDgtNThjYy00MTZhLWI4YTMtNTIzMDVkZGE5Mjlh'
 					}
 				,
 				products: []
