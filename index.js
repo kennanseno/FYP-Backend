@@ -81,7 +81,7 @@ app.post(path + '/registerUser', function(req, res) {
 		email: req.body.email,
 		password: req.body.password,
 		name: req.body.name,
-		address: req.query.address,
+		address: req.body.address,
 		stores: []
 	};
 
