@@ -4,6 +4,7 @@ var app = express();
 var bodyParser = require('body-parser');
 var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
+var geolib = require('geolib');
 
 app.use(bodyParser());
 app.use(express.static('public'));
@@ -74,6 +75,35 @@ app.get(path + '/getStoreDetails', function(req, res) {
 	});
 });
 
+app.get(path + '/searchNearbyStores', function(req, res) {
+	var lat = geolib.useDecimal(req.query.latitude),
+		long = geolib.useDecimal(req.query.longitude),
+		radius = req.query.radius;
+
+	var params = [
+   		{ $unwind: '$stores' },
+    	{ $project: {'name': '$stores.name', 'description': '$stores.description', 'location': '$stores.location'} }
+	];
+
+	aggregate(database, params, function(docs) {
+		var result = [];
+		docs.forEach(function(store) {
+			var distance = geolib.getDistance(
+    			{ latitude: lat, longitude: long },
+    			{ latitude: store.location.latitude, longitude: store.location.longitude }
+			);
+
+			var distanceInKilometers = geolib.convertUnit('km', distance, 1);
+			console.log(distanceInKilometers);
+
+			//check if store is within proximity search radius
+			if(distanceInKilometers <= radius) {
+				result.append(store);
+			}
+		})
+		res.send(result);	
+	});
+});
 
 app.post(path + '/registerUser', function(req, res) {
 	var data = {
@@ -149,6 +179,10 @@ app.get(path + '/test/insertTestUser', function(req, res) {
 				name: 'Store 1',
 				description: 'Most awesome store!',
 				address: '25 millstead',
+				location: {
+					    latitude: 53.35487382895707,
+    					longitude: -6.279025369998967
+				},
 				paymentMethod: 
 					{
 						_id: 'SIMPLIFY',
@@ -161,6 +195,10 @@ app.get(path + '/test/insertTestUser', function(req, res) {
 				name: 'Store 2',
 				description: 'Most awesome store!',
 				address: '25 millstead',
+				location: {
+					latitude: 53.33785738724761,
+					longitude: -6.267085527951536
+				},
 				products: []
 			}
 		]
