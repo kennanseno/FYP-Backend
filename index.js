@@ -76,7 +76,6 @@ app.get(path + '/getStoreDetails', function(req, res) {
 });
 
 app.get(path + '/searchNearbyStores', function(req, res) {
-	console.log("lat:", req.query.latitude, "long:", req.query.longitude, "rad:", radius);
 	var lat = geolib.useDecimal(req.query.latitude),
 		long = geolib.useDecimal(req.query.longitude),
 		radius = req.query.radius;
@@ -86,7 +85,6 @@ app.get(path + '/searchNearbyStores', function(req, res) {
     	{ $project: {'name': '$stores.name', 'description': '$stores.description', 'location': '$stores.location'} }
 	];
 
-	console.log("lat:", lat, "long:", long, "rad:", radius);
 	aggregate(database, params, function(docs) {
 		var result = [];
 		docs.forEach(function(store) {
@@ -100,7 +98,7 @@ app.get(path + '/searchNearbyStores', function(req, res) {
 
 			//check if store is within proximity search radius
 			if(distanceInKilometers <= radius) {
-				result.append(store);
+				result.push(store);
 			}
 		})
 		res.json(result);	
