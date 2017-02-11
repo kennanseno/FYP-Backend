@@ -85,6 +85,7 @@ app.get(path + '/searchNearbyStores', function(req, res) {
     	{ $project: {'name': '$stores.name', 'description': '$stores.description', 'location': '$stores.location'} }
 	];
 
+	console.log("lat:", lat, "long:", long, "rad:", radius);
 	aggregate(database, params, function(docs) {
 		var result = [];
 		docs.forEach(function(store) {
@@ -101,7 +102,7 @@ app.get(path + '/searchNearbyStores', function(req, res) {
 				result.append(store);
 			}
 		})
-		res.send(result);	
+		res.json(result);	
 	});
 });
 
