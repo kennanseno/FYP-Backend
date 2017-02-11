@@ -76,6 +76,7 @@ app.get(path + '/getStoreDetails', function(req, res) {
 });
 
 app.get(path + '/searchNearbyStores', function(req, res) {
+	console.log("lat:", req.query.latitude, "long:", req.query.longitude, "rad:", radius);
 	var lat = geolib.useDecimal(req.query.latitude),
 		long = geolib.useDecimal(req.query.longitude),
 		radius = req.query.radius;
