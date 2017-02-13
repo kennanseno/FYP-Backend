@@ -82,7 +82,7 @@ app.get(path + '/searchNearbyStores', function(req, res) {
 
 	var params = [
    		{ $unwind: '$stores' },
-    	{ $project: {'name': '$stores.name', 'description': '$stores.description', 'location': '$stores.location'} }
+    	{ $project: {'name': '$stores.name', 'description': '$stores.description', 'owner': '$username', 'location': '$stores.location'} }
 	];
 
 	aggregate(database, params, function(docs) {
