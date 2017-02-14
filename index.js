@@ -82,7 +82,13 @@ app.get(path + '/searchNearbyStores', function(req, res) {
 
 	var params = [
    		{ $unwind: '$stores' },
-    	{ $project: {'name': '$stores.name', 'description': '$stores.description', 'owner': '$username', 'location': '$stores.location'} }
+    	{ $project: {
+			'name': '$stores.name', 
+			'description': 
+			'$stores.description', 
+			'owner': '$username', 
+			'location': '$stores.location' }
+		}
 	];
 
 	aggregate(database, params, function(docs) {
@@ -112,6 +118,7 @@ app.post(path + '/registerUser', function(req, res) {
 		password: req.body.password,
 		name: req.body.name,
 		address: req.body.address,
+		cart: [],
 		stores: []
 	};
 
@@ -144,6 +151,18 @@ app.post(path + '/addProduct', function(req, res) {
 	});
 });
 
+app.post(path + '/addToCart', function(req, res) {
+	var params = req.body.params,
+		data = { 
+			$push: { 'cart' : req.body.data }
+		};
+
+	updateDocuments(database, params, data, function(result) {
+		res.send(result.result)
+	});
+});
+
+
 app.post(path + '/addPaymentMethod', function(req, res) {
 	var params = req.body.params,
 	data = { 
@@ -174,6 +193,7 @@ app.get(path + '/test/insertTestUser', function(req, res) {
 		password: 'test',
 		name: 'Test Test',
 		address: '25 test St., Test',
+		cart: [],
 		stores: [
 			{
 				name: 'Store 1',
