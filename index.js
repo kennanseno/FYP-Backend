@@ -184,6 +184,38 @@ app.get(path + '/removeUser', function(req, res) {
 	});
 });
 
+
+/**
+ * Gets Product details of products that are in the user's cart
+ */
+app.get(path + '/getCartData', function(req, res) {
+	var data = { username: req.query.username };	
+	var params = { cart: true };
+
+	findDocuments(database, data, params, function(docs) {
+		var products = docs[0].cart;
+		var result= [];
+
+		products.forEach(function(product, index) {
+			var params = [
+				{ $match: {'username': req.query.username} },
+				{ $unwind: '$stores' },
+				{ $match: {'stores.name': req.query.storename} },
+				{ $project: { 'product': '$stores.products' } },
+				{ $unwind: '$product' },
+				{ $match: {'product._id': product.product_id } }
+			];
+			aggregate(database, params, function(details) {
+				result.push(details[0].product);
+				if (index === products.length - 1) {
+					res.send(result);
+				}
+			});
+
+		});		
+	});
+});
+
 /* ------------ TEST CODE -------------------- */
 
 app.get(path + '/test/insertTestUser', function(req, res) {
@@ -193,7 +225,20 @@ app.get(path + '/test/insertTestUser', function(req, res) {
 		password: 'test',
 		name: 'Test Test',
 		address: '25 test St., Test',
-		cart: [],
+		cart: [{
+
+			"product_id": "8710624215682",
+			"store_name": "Store 1",
+			"store_owner": "test"
+
+		},
+		{
+
+			"product_id": "9710624215682",
+			"store_name": "Store 1",
+			"store_owner": "test"
+
+		}],
 		stores: [
 			{
 				name: 'Store 1',
@@ -209,7 +254,20 @@ app.get(path + '/test/insertTestUser', function(req, res) {
 						publicKey: 'sbpb_MmVmOGUyNDgtNThjYy00MTZhLWI4YTMtNTIzMDVkZGE5Mjlh'
 					}
 				,
-				products: []
+				products: [
+					{
+						"description": "test",
+						"name": "testProduct",
+						"_id": "8710624215682",
+						"price": 13
+					},
+					{
+						"description": "test",
+						"name": "Product 2",
+						"_id": "9710624215682",
+						"price": 11
+					}
+				]
 			},
 			{
 				name: 'Store 2',
