@@ -196,17 +196,18 @@ app.get(path + '/getCartData', function(req, res) {
 		var products = docs[0].cart;
 		var result= [];
 
-		products.forEach(function(product, index) {
+		products.forEach(function(object, index) {
 			var params = [
-				{ $match: {'username': req.query.username} },
+				{ $match: {'username': object.store_owner} },
 				{ $unwind: '$stores' },
-				{ $match: {'stores.name': req.query.storename} },
-				{ $project: { 'product': '$stores.products' } },
-				{ $unwind: '$product' },
-				{ $match: {'product._id': product.product_id } }
+				{ $match: {'stores.name': object.store_name} },
+				{ $project: { 'products': '$stores.products' } },
+				{ $unwind: '$products' },
+				{ $match: {'products._id': object.product_id } }
 			];
+
 			aggregate(database, params, function(details) {
-				result.push(details[0].product);
+				result.push(details[0].products);
 				if (index === products.length - 1) {
 					res.send(result);
 				}
