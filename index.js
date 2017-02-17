@@ -208,6 +208,7 @@ app.get(path + '/getCartData', function(req, res) {
 			];
 
 			aggregate(database, params, function(details) {
+				details[0].products.quantity = object.quantity; //inject quantity of each product in cart. FIND BETTER SOLUTION!
 				result.push(details[0].products);
 				if (index === products.length - 1) {
 					res.send(result);
