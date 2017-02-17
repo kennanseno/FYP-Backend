@@ -196,6 +196,7 @@ app.get(path + '/getCartData', function(req, res) {
 		var products = docs[0].cart;
 		var result= [];
 
+		//TODO: use $in operator instead
 		products.forEach(function(object, index) {
 			var params = [
 				{ $match: {'username': object.store_owner} },
@@ -214,6 +215,57 @@ app.get(path + '/getCartData', function(req, res) {
 			});
 
 		});		
+	});
+});
+
+app.get(path + '/getCartData', function(req, res) {
+	var data = { username: req.query.username };	
+	var params = { cart: true };
+
+	findDocuments(database, data, params, function(docs) {
+		var products = docs[0].cart;
+		var result= [];
+
+		//TODO: use $in operator instead
+		products.forEach(function(object, index) {
+			var params = [
+				{ $match: {'username': object.store_owner} },
+				{ $unwind: '$stores' },
+				{ $match: {'stores.name': object.store_name} },
+				{ $project: { 'products': '$stores.products' } },
+				{ $unwind: '$products' },
+				{ $match: {'products._id': object.product_id } }
+			];
+
+			aggregate(database, params, function(details) {
+				result.push(details[0].products);
+				if (index === products.length - 1) {
+					res.send(result);
+				}
+			});
+
+		});		
+	});
+});
+
+app.get(path + '/productExists', function(req, res) {
+	var params = [
+		{ $match: {'username': req.query.username} },
+		{ $unwind: '$stores' },
+		{ $match: {'stores.name': req.query.storename} },
+		{ $unwind: '$stores.products' },
+		{ $project: {'products': '$stores.products'} },
+		{ $match: { 'products._id': req.query.product_id} }
+	];
+
+	console.log(params);
+	aggregate(database, params, function(docs) {
+		//returns false if no documents exist
+		if(docs.length === 0) {
+			res.send(false);
+			return;
+		}
+		res.send(true);	
 	});
 });
 
