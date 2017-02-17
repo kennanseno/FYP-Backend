@@ -220,9 +220,9 @@ app.get(path + '/getCartData', function(req, res) {
 
 app.get(path + '/productExists', function(req, res) {
 	var params = [
-		{ $match: {'username': req.query.username} },
+		{ $match: {'username': req.query.store_owner} },
 		{ $unwind: '$stores' },
-		{ $match: {'stores.name': req.query.storename} },
+		{ $match: {'stores.name': req.query.store_name} },
 		{ $unwind: '$stores.products' },
 		{ $project: {'products': '$stores.products'} },
 		{ $match: { 'products._id': req.query.product_id} }
