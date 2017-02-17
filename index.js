@@ -247,20 +247,7 @@ app.get(path + '/test/insertTestUser', function(req, res) {
 		password: 'test',
 		name: 'Test Test',
 		address: '25 test St., Test',
-		cart: [{
-
-			"product_id": "8710624215682",
-			"store_name": "Store 1",
-			"store_owner": "test"
-
-		},
-		{
-
-			"product_id": "9710624215682",
-			"store_name": "Store 1",
-			"store_owner": "test"
-
-		}],
+		cart: [],
 		stores: [
 			{
 				name: 'Store 1',
