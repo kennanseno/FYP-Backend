@@ -67,7 +67,7 @@ app.get(path + '/getStoreDetails', function(req, res) {
 	var params = [
 		{ $match: {'username': req.query.store_owner} },
 		{ $unwind: '$stores' },
-		{ $match: {'stores._id': req.query.store_id} },
+		{ $match: {'stores.id': req.query.store_id} },
 		{ $project: {'products': '$stores.products', 'paymentMethod': '$stores.paymentMethod._id'} }
 	];
 
@@ -134,7 +134,7 @@ app.post(path + '/createStore', function(req, res) {
 		data = { 
 			$push: { 
 				stores: {
-					_id: ObjectId(),
+					id: ObjectId(),
 					name: req.body.name,
 					description: req.body.description,
 					address: req.body.address,
@@ -261,7 +261,7 @@ app.get(path + '/test/insertTestUser', function(req, res) {
 		cart: [],
 		stores: [
 			{
-				_id: 'store1',
+				id: 'store1',
 				name: 'Store 1',
 				description: 'Most awesome store!',
 				address: '25 millstead',
@@ -291,7 +291,7 @@ app.get(path + '/test/insertTestUser', function(req, res) {
 				]
 			},
 			{
-				_id: 'store2',
+				id: 'store2',
 				name: 'Store 2',
 				description: 'Most awesome store!',
 				address: '25 millstead',
