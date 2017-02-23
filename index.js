@@ -172,9 +172,11 @@ app.post(path + '/addToCart', function(req, res) {
 
 
 app.post(path + '/addPaymentMethod', function(req, res) {
-	var params = req.body.params,
+	var params = {
+		'stores.id': req.body.store_id
+	},
 	data = { 
-		$set: { 'stores.$.paymentMethod' : req.body.data }
+		$set: { 'stores.$.paymentMethod' : req.body.key }
 	};
 
 	updateDocuments(database, params, data, function(result) {
