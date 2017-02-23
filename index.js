@@ -3,6 +3,7 @@ var _ = require('lodash');
 var app = express();
 var bodyParser = require('body-parser');
 var MongoClient = require('mongodb').MongoClient;
+var ObjectId = require('mongodb').ObjectID;
 var assert = require('assert');
 var geolib = require('geolib');
 
@@ -130,11 +131,12 @@ app.post(path + '/registerUser', function(req, res) {
 
 app.post(path + '/createStore', function(req, res) {
 	req.body.data.products = []; // inject empty product array
+	req.body.data["_id"] = ObjectId();
 	var params = req.body.params,
 		data = { 
 			$push: { stores: req.body.data }
 		};
-	
+	console.log(req.body.data);
 	updateDocuments(database, params, data, function(result) {
 		res.send(result.result)
 	});
