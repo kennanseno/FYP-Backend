@@ -130,13 +130,19 @@ app.post(path + '/registerUser', function(req, res) {
 });
 
 app.post(path + '/createStore', function(req, res) {
-	req.body.data.products = []; // inject empty product array
-	req.body.data["_id"] = ObjectId();
-	var params = req.body.params,
+	var params = { username: req.body.username },
 		data = { 
-			$push: { stores: req.body.data }
+			$push: { 
+				stores: {
+					_id: ObjectId(),
+					name: req.body.name,
+					description: req.body.description,
+					address: req.body.address,
+					location: req.body.location,
+					products: []
+				} 
+			}
 		};
-	console.log(req.body.data);
 	updateDocuments(database, params, data, function(result) {
 		res.send(result.result)
 	});
