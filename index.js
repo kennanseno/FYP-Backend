@@ -5,6 +5,7 @@ var bodyParser = require('body-parser');
 var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
 var geolib = require('geolib');
+var Simplify = require("simplify-commerce");
 
 app.use(bodyParser());
 app.use(express.static('public'));
@@ -209,6 +210,8 @@ app.get(path + '/getCartData', function(req, res) {
 
 			aggregate(database, params, function(details) {
 				details[0].products.quantity = object.quantity; //inject quantity of each product in cart. FIND BETTER SOLUTION!
+				
+				//hack for now to add store owner/name
 				result.push(details[0].products);
 				if (index === products.length - 1) {
 					res.send(result);
@@ -238,6 +241,38 @@ app.get(path + '/productExists', function(req, res) {
 		res.send(true);	
 	});
 });
+
+app.get(path + '/pay', function(req, res) {
+	
+});
+
+var simplifyPayment = function(key, data) {
+	client = Simplify.getClient({
+		publicKey: key.publicKey,
+		privateKey: key.privateKey
+	});
+
+	transactionData = {
+		amount: data.price,
+		currency: data.currency, // only support 1 currency for now
+		card: {
+			number: data.card.number,
+			expMonth: data.card.expMonth,
+			expYear: data.card.expYear,
+			cvc: data.card.cvc
+		}
+	}
+
+	client.payment.create( transactionData, function(errData, data) {
+		if(errData) {
+			console.error("Error Message:", errData.data.error.message);
+			res.send("Payment Status:", JSON.stringify(errData));
+			return;
+		}
+
+		console.log("Payment Status:", data.paymentStatus);
+	})
+}
 
 /* ------------ TEST CODE -------------------- */
 
