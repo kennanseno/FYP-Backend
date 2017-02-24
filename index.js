@@ -178,9 +178,9 @@ app.post(path + '/addToCart', function(req, res) {
 		var productData = req.body.data;
 		var data;
 
-		if(typeof doc.cart.products != 'undefined') {
+		if(_.keys(doc[0].cart).length > 0) {
 			data = { 
-				$push: { 
+				$addToSet: { 
 					'cart.products' : {
 						product_id: productData.product_id,
 						quantity: productData.quantity
