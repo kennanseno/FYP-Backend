@@ -181,10 +181,10 @@ app.post(path + '/addToCart', function(req, res) {
 		if(_.keys(doc.cart) > 0) {
 			data = { 
 				$push: { 
-					'cart.$.products' : [{
+					'cart.$.products' : {
 						product_id: productData.product_id,
 						quantity: productData.quantity
-					}]
+					}
 				}
 			}
 		} else {
