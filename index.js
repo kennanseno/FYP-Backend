@@ -3,6 +3,7 @@ var _ = require('lodash');
 var app = express();
 var bodyParser = require('body-parser');
 var MongoClient = require('mongodb').MongoClient;
+var ObjectId = require('mongodb').ObjectID;
 var assert = require('assert');
 var geolib = require('geolib');
 var Simplify = require("simplify-commerce");
@@ -65,9 +66,8 @@ app.get(path + '/getStore', function(req, res) {
 // Gets store products and payment method
 app.get(path + '/getStoreDetails', function(req, res) {
 	var params = [
-		{ $match: {'username': req.query.username} },
 		{ $unwind: '$stores' },
-		{ $match: {'stores.name': req.query.storename} },
+		{ $match: {'stores.id': ObjectId(req.query.store_id)} },
 		{ $project: {'products': '$stores.products', 'paymentMethod': '$stores.paymentMethod._id'} }
 	];
 
@@ -84,9 +84,9 @@ app.get(path + '/searchNearbyStores', function(req, res) {
 	var params = [
    		{ $unwind: '$stores' },
     	{ $project: {
+			'id': '$stores.id',
 			'name': '$stores.name', 
-			'description': 
-			'$stores.description', 
+			'description': '$stores.description', 
 			'owner': '$username', 
 			'location': '$stores.location' }
 		}
@@ -130,22 +130,39 @@ app.post(path + '/registerUser', function(req, res) {
 });
 
 app.post(path + '/createStore', function(req, res) {
-	req.body.data.products = []; // inject empty product array
-	var params = req.body.params,
+	var params = { username: req.body.username },
 		data = { 
-			$push: { stores: req.body.data }
+			$push: { 
+				stores: {
+					id: ObjectId(),
+					name: req.body.name,
+					description: req.body.description,
+					address: req.body.address,
+					location: req.body.location,
+					products: []
+				} 
+			}
 		};
-	
 	updateDocuments(database, params, data, function(result) {
 		res.send(result.result)
 	});
 });
 
 app.post(path + '/addProduct', function(req, res) {
-	var params = req.body.params,
-		data = { 
-			$push: { 'stores.$.products' : req.body.data }
-		};
+	var params = {
+		'stores.id': ObjectId(req.body.store_id)
+	},
+	productData = req.body.data,
+	data = { 
+		$push: { 
+			'stores.$.products' : {
+				'_id': productData.code,
+				'name': productData.name,
+				'description': productData.description,
+				'price': productData.price
+			} 
+		}
+	};
 
 	updateDocuments(database, params, data, function(result) {
 		res.send(result.result)
@@ -153,9 +170,18 @@ app.post(path + '/addProduct', function(req, res) {
 });
 
 app.post(path + '/addToCart', function(req, res) {
-	var params = req.body.params,
+	var params = {
+		'username': req.body.username
+	},
+	productData = req.body.data,
 		data = { 
-			$push: { 'cart' : req.body.data }
+			$push: { 
+				'cart' : {
+					product_id: productData.product_id,
+					store_id: productData.store_id,
+					quantity: productData.quantity
+				}
+			}
 		};
 
 	updateDocuments(database, params, data, function(result) {
@@ -165,12 +191,17 @@ app.post(path + '/addToCart', function(req, res) {
 
 
 app.post(path + '/addPaymentMethod', function(req, res) {
-	var params = req.body.params,
+	var params = {
+		'stores.id': ObjectId(req.body.params.store_id)
+	},
 	data = { 
-		$set: { 'stores.$.paymentMethod' : req.body.data }
+		$set: { 'stores.$.paymentMethod' : req.body.key }
 	};
-
+	
+	console.log('params', params);
+	console.log('data', data);
 	updateDocuments(database, params, data, function(result) {
+		console.log(result.result);
 		res.send(result.result)
 	});
 });
@@ -200,9 +231,8 @@ app.get(path + '/getCartData', function(req, res) {
 		//TODO: use $in operator instead
 		products.forEach(function(object, index) {
 			var params = [
-				{ $match: {'username': object.store_owner} },
 				{ $unwind: '$stores' },
-				{ $match: {'stores.name': object.store_name} },
+				{ $match: {'stores.id': ObjectId(object.store_id) } },
 				{ $project: { 'products': '$stores.products' } },
 				{ $unwind: '$products' },
 				{ $match: {'products._id': object.product_id } }
@@ -224,9 +254,8 @@ app.get(path + '/getCartData', function(req, res) {
 
 app.get(path + '/productExists', function(req, res) {
 	var params = [
-		{ $match: {'username': req.query.store_owner} },
 		{ $unwind: '$stores' },
-		{ $match: {'stores.name': req.query.store_name} },
+		{ $match: { 'stores.id': ObjectId(req.query.store_id) } },
 		{ $unwind: '$stores.products' },
 		{ $project: {'products': '$stores.products'} },
 		{ $match: { 'products._id': req.query.product_id} }
@@ -286,6 +315,7 @@ app.get(path + '/test/insertTestUser', function(req, res) {
 		cart: [],
 		stores: [
 			{
+				id: ObjectId(),
 				name: 'Store 1',
 				description: 'Most awesome store!',
 				address: '25 millstead',
@@ -315,6 +345,7 @@ app.get(path + '/test/insertTestUser', function(req, res) {
 				]
 			},
 			{
+				id: ObjectId(),
 				name: 'Store 2',
 				description: 'Most awesome store!',
 				address: '25 millstead',
