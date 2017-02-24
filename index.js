@@ -65,9 +65,8 @@ app.get(path + '/getStore', function(req, res) {
 // Gets store products and payment method
 app.get(path + '/getStoreDetails', function(req, res) {
 	var params = [
-		{ $match: {'username': req.query.store_owner} },
 		{ $unwind: '$stores' },
-		{ $match: {'stores.id': req.query.store_id} },
+		{ $match: {'stores.id': ObjectId(req.query.store_id)} },
 		{ $project: {'products': '$stores.products', 'paymentMethod': '$stores.paymentMethod._id'} }
 	];
 
