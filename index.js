@@ -148,10 +148,20 @@ app.post(path + '/createStore', function(req, res) {
 });
 
 app.post(path + '/addProduct', function(req, res) {
-	var params = req.body.params,
-		data = { 
-			$push: { 'stores.$.products' : req.body.data }
-		};
+	var params = {
+		'stores.id': ObjectId(req.body.store_id)
+	},
+	productData = req.body.data,
+	data = { 
+		$push: { 
+			'stores.$.products' : {
+				'_id': productData.code,
+				'name': productData.name,
+				'description': productData.description,
+				'price': productData.price
+			} 
+		}
+	};
 
 	updateDocuments(database, params, data, function(result) {
 		res.send(result.result)
