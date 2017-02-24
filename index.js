@@ -178,7 +178,7 @@ app.post(path + '/addToCart', function(req, res) {
 		var productData = req.body.data;
 		var data;
 		
-		if(doc.cart.length > 0) {
+		if(_.keys(doc.cart) > 0) {
 			data = { 
 				$push: { 
 					'cart.$.products' : [{
@@ -193,10 +193,10 @@ app.post(path + '/addToCart', function(req, res) {
 				$set: { 
 					'cart' : {
 						store_id: productData.store_id,
-						products: {
+						products: [{
 							product_id: productData.product_id,
 							quantity: productData.quantity
-						}
+						}]
 					}
 				}
 			}
