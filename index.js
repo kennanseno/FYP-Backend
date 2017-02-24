@@ -83,9 +83,9 @@ app.get(path + '/searchNearbyStores', function(req, res) {
 	var params = [
    		{ $unwind: '$stores' },
     	{ $project: {
+			'id': '$stores.id',
 			'name': '$stores.name', 
-			'description': 
-			'$stores.description', 
+			'description': '$stores.description', 
 			'owner': '$username', 
 			'location': '$stores.location' }
 		}
@@ -169,9 +169,18 @@ app.post(path + '/addProduct', function(req, res) {
 });
 
 app.post(path + '/addToCart', function(req, res) {
-	var params = req.body.params,
+	var params = {
+		'username': req.body.username
+	},
+	productData = req.body.data,
 		data = { 
-			$push: { 'cart' : req.body.data }
+			$push: { 
+				'cart' : {
+					product_id: productData.product_id,
+					store_id: productData.store_id,
+					quantity: productData.quantity
+				}
+			}
 		};
 
 	updateDocuments(database, params, data, function(result) {
@@ -221,9 +230,8 @@ app.get(path + '/getCartData', function(req, res) {
 		//TODO: use $in operator instead
 		products.forEach(function(object, index) {
 			var params = [
-				{ $match: {'username': object.store_owner} },
 				{ $unwind: '$stores' },
-				{ $match: {'stores.name': object.store_name} },
+				{ $match: {'stores.id': ObjectId(object.store_id) } },
 				{ $project: { 'products': '$stores.products' } },
 				{ $unwind: '$products' },
 				{ $match: {'products._id': object.product_id } }
@@ -243,9 +251,8 @@ app.get(path + '/getCartData', function(req, res) {
 
 app.get(path + '/productExists', function(req, res) {
 	var params = [
-		{ $match: {'username': req.query.store_owner} },
 		{ $unwind: '$stores' },
-		{ $match: {'stores.name': req.query.store_name} },
+		{ $match: { 'stores.id': ObjectId(req.query.store_id) } },
 		{ $unwind: '$stores.products' },
 		{ $project: {'products': '$stores.products'} },
 		{ $match: { 'products._id': req.query.product_id} }
