@@ -119,7 +119,7 @@ app.post(path + '/registerUser', function(req, res) {
 		password: req.body.password,
 		name: req.body.name,
 		address: req.body.address,
-		cart: [],
+		cart: {},
 		stores: []
 	};
 
@@ -181,16 +181,16 @@ app.post(path + '/addToCart', function(req, res) {
 		if(doc.cart.length > 0) {
 			data = { 
 				$push: { 
-					'cart.products' : {
+					'cart.$.products' : [{
 						product_id: productData.product_id,
 						quantity: productData.quantity
-					}
+					}]
 				}
 			}
 		} else {
 			//if no product exist in cart
 			data = { 
-				$push: { 
+				$set: { 
 					'cart' : {
 						store_id: productData.store_id,
 						products: {
@@ -241,7 +241,7 @@ app.get(path + '/getCartData', function(req, res) {
 	var params = { cart: true };
 
 	findDocuments(database, data, params, function(docs) {
-		var products = docs[0].cart;
+		var products = docs.cart;
 		var result= [];
 
 		//TODO: use $in operator instead
@@ -328,7 +328,7 @@ app.get(path + '/test/insertTestUser', function(req, res) {
 		password: 'test',
 		name: 'Test Test',
 		address: '25 test St., Test',
-		cart: [],
+		cart: {},
 		stores: [
 			{
 				id: ObjectId(),
