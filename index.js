@@ -172,21 +172,40 @@ app.post(path + '/addProduct', function(req, res) {
 app.post(path + '/addToCart', function(req, res) {
 	var params = {
 		'username': req.body.username
-	},
-	productData = req.body.data,
-		data = { 
-			$push: { 
-				'cart' : {
-					product_id: productData.product_id,
-					store_id: productData.store_id,
-					quantity: productData.quantity
+	};
+
+	findDocuments(database, params, { 'cart': true }, function(doc) {
+		var productData = req.body.data;
+		var data;
+		
+		if(doc.cart.length > 0) {
+			data = { 
+				$push: { 
+					'cart.products' : {
+						product_id: productData.product_id,
+						quantity: productData.quantity
+					}
 				}
 			}
-		};
-
-	updateDocuments(database, params, data, function(result) {
-		res.send(result.result)
+		} else {
+			//if no product exist in cart
+			data = { 
+				$push: { 
+					'cart' : {
+						store_id: productData.store_id,
+						products: {
+							product_id: productData.product_id,
+							quantity: productData.quantity
+						}
+					}
+				}
+			}
+		}
+		updateDocuments(database, params, data, function(result) {
+			res.send(result.result)
+		});
 	});
+
 });
 
 
@@ -198,10 +217,7 @@ app.post(path + '/addPaymentMethod', function(req, res) {
 		$set: { 'stores.$.paymentMethod' : req.body.key }
 	};
 	
-	console.log('params', params);
-	console.log('data', data);
 	updateDocuments(database, params, data, function(result) {
-		console.log(result.result);
 		res.send(result.result)
 	});
 });
@@ -387,7 +403,6 @@ app.get(path + '/test/removeAllUsers', function(req, res) {
 	var data = {}
 	removeDocument(database, data, function(docs) {
 		res.send('All users deleted!');
-		console.log('All users deleted!');
 	});
 });
 
@@ -416,7 +431,6 @@ var findDocuments = function(db, data, params, callback) {
 	
 	collection.find(data, params).toArray(function(err, docs) {
 		assert.equal(err, null);
-		console.log(docs.length + ' Documents found!');
 		callback(docs);
 	});
 }
