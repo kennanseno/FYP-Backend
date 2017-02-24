@@ -177,16 +177,17 @@ app.post(path + '/addToCart', function(req, res) {
 	findDocuments(database, params, { 'cart': true }, function(doc) {
 		var productData = req.body.data;
 		var data;
-		
-		if(_.keys(doc.cart) > 0) {
+
+		if(typeof doc.cart.products != 'undefined') {
 			data = { 
 				$push: { 
-					'cart.$.products' : {
+					'cart.products' : {
 						product_id: productData.product_id,
 						quantity: productData.quantity
 					}
 				}
 			}
+			console.log('1');
 		} else {
 			//if no product exist in cart
 			data = { 
@@ -200,8 +201,10 @@ app.post(path + '/addToCart', function(req, res) {
 					}
 				}
 			}
+			console.log('2');
 		}
 		updateDocuments(database, params, data, function(result) {
+			console.log('result:', result.result);
 			res.send(result.result)
 		});
 	});
@@ -439,7 +442,7 @@ var updateDocuments = function(db, params, data, callback) {
 	var collection = db.collection(collectionUsed);
 
 	collection.update(params, data, function(err, result) {
-		assert.equal(err, null);
+//		assert.equal(err, null);
 		callback(result);
 	});
 }
