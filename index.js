@@ -273,7 +273,7 @@ app.get(path + '/test/insertTestUser', function(req, res) {
 		cart: [],
 		stores: [
 			{
-				id: 'store1',
+				id: ObjectId(),
 				name: 'Store 1',
 				description: 'Most awesome store!',
 				address: '25 millstead',
@@ -303,7 +303,7 @@ app.get(path + '/test/insertTestUser', function(req, res) {
 				]
 			},
 			{
-				id: 'store2',
+				id: ObjectId(),
 				name: 'Store 2',
 				description: 'Most awesome store!',
 				address: '25 millstead',
