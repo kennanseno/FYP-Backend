@@ -187,7 +187,6 @@ app.post(path + '/addToCart', function(req, res) {
 					}
 				}
 			}
-			console.log('1');
 		} else {
 			//if no product exist in cart
 			data = { 
@@ -201,10 +200,8 @@ app.post(path + '/addToCart', function(req, res) {
 					}
 				}
 			}
-			console.log('2');
 		}
 		updateDocuments(database, params, data, function(result) {
-			console.log('result:', result.result);
 			res.send(result.result)
 		});
 	});
@@ -290,7 +287,26 @@ app.get(path + '/productExists', function(req, res) {
 	});
 });
 
-app.get(path + '/pay', function(req, res) {
+app.post(path + '/pay', function(req, res) {
+	var store_id = req.body.store_id,
+		data = {
+			amount: req.body.amount,
+			currency: req.body.currency,
+			card: {
+				number: req.body.card.number,
+				expMonth: data.card.expMonth,
+				expYear: data.card.expYear,
+				cvc: req.body.card.cvc
+			}
+		};
+
+	findDocuments(database, { 'stores.id': ObjectId(store_id) }, {'stores': true}, function(doc) {
+		var store = doc[0].stores,
+			paymentMethod = store.paymentMethod;
+		if(paymentMethod["_id"] == 'SIMPLIFY') {
+			simplifyPayment(paymentMethod, data)
+		} 
+	});
 	
 });
 
@@ -301,7 +317,7 @@ var simplifyPayment = function(key, data) {
 	});
 
 	transactionData = {
-		amount: data.price,
+		amount: data.amount,
 		currency: data.currency, // only support 1 currency for now
 		card: {
 			number: data.card.number,
@@ -319,6 +335,7 @@ var simplifyPayment = function(key, data) {
 		}
 
 		console.log("Payment Status:", data.paymentStatus);
+		res.send("Payment Status:", JSON.stringify(errData));
 	})
 }
 
@@ -342,26 +359,11 @@ app.get(path + '/test/insertTestUser', function(req, res) {
 					    latitude: 53.35487382895707,
     					longitude: -6.279025369998967
 				},
-				paymentMethod: 
-					{
-						_id: 'SIMPLIFY',
-						publicKey: 'sbpb_MmVmOGUyNDgtNThjYy00MTZhLWI4YTMtNTIzMDVkZGE5Mjlh'
-					}
-				,
-				products: [
-					{
-						"description": "test",
-						"name": "testProduct",
-						"_id": "8710624215682",
-						"price": 13
-					},
-					{
-						"description": "test",
-						"name": "Product 2",
-						"_id": "9710624215682",
-						"price": 11
-					}
-				]
+				paymentMethod: {
+						_id: 'STRIPE',
+						publicKey: 'sbpb_MmVmOGUyNDgtNThjYy00MTZhLWI4YTMtNTIzMDVkZGE5Mjlh',
+				},
+				products: []
 			},
 			{
 				id: ObjectId(),
@@ -371,6 +373,11 @@ app.get(path + '/test/insertTestUser', function(req, res) {
 				location: {
 					latitude: 53.33785738724761,
 					longitude: -6.267085527951536
+				},
+				paymentMethod: {
+					_id: 'SIMPLIFY',
+					publicKey: 'sbpb_N2ZjYTQ2NWUtZTVlMC00MDJiLTgyOGMtODYxMjM3OTY1MWVh',
+					privateKey: 'qY1HX8kEexQ/uKRTPloEMIRZj8hLBFD5yIVbI5NjY555YFFQL0ODSXAOkNtXTToq'
 				},
 				products: []
 			}
@@ -442,7 +449,7 @@ var updateDocuments = function(db, params, data, callback) {
 	var collection = db.collection(collectionUsed);
 
 	collection.update(params, data, function(err, result) {
-//		assert.equal(err, null);
+		assert.equal(err, null);
 		callback(result);
 	});
 }
