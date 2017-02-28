@@ -239,16 +239,19 @@ app.get(path + '/removeUser', function(req, res) {
 app.get(path + '/getCartData', function(req, res) {
 	var data = { username: req.query.username };	
 	var params = { cart: true };
-
+	
 	findDocuments(database, data, params, function(docs) {
-		var products = docs.cart;
-		var result= [];
+		var cart = docs[0].cart;
+		var result= {
+			store_id: cart.store_id,
+			products: []
+		};
 
-		//TODO: use $in operator instead
+		var products = cart.products;
 		products.forEach(function(object, index) {
 			var params = [
 				{ $unwind: '$stores' },
-				{ $match: {'stores.id': ObjectId(object.store_id) } },
+				{ $match: {'stores.id': ObjectId(cart.store_id) } },
 				{ $project: { 'products': '$stores.products' } },
 				{ $unwind: '$products' },
 				{ $match: {'products._id': object.product_id } }
@@ -258,7 +261,7 @@ app.get(path + '/getCartData', function(req, res) {
 				details[0].products.quantity = object.quantity; //inject quantity of each product in cart. FIND BETTER SOLUTION!
 				
 				//hack for now to add store owner/name
-				result.push(details[0].products);
+				result.products.push(details[0].products);
 				if (index === products.length - 1) {
 					res.send(result);
 				}
