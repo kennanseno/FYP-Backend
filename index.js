@@ -68,7 +68,7 @@ app.get(path + '/getStoreDetails', function(req, res) {
 	var params = [
 		{ $unwind: '$stores' },
 		{ $match: {'stores.id': ObjectId(req.query.store_id)} },
-		{ $project: {'products': '$stores.products', 'paymentMethod': '$stores.paymentMethod._id'} }
+		{ $project: {'products': '$stores.products', 'paymentMethod': '$stores.paymentMethod.id'} }
 	];
 
 	aggregate(database, params, function(docs) {
@@ -290,24 +290,29 @@ app.get(path + '/productExists', function(req, res) {
 	});
 });
 
+//change to  aggregate to find store
 app.post(path + '/pay', function(req, res) {
 	var store_id = req.body.store_id,
 		data = {
-			amount: req.body.amount,
-			currency: req.body.currency,
+			amount: _.toString(req.body.amount),
+			description: 'TEST',
 			card: {
-				number: req.body.card.number,
-				expMonth: data.card.expMonth,
-				expYear: data.card.expYear,
-				cvc: req.body.card.cvc
-			}
+				number: req.body.card.number.replace(/ /g, ""),
+				expMonth: req.body.card.expiration.slice(0, 2),
+				expYear: req.body.card.expiration.slice(3, 5),
+				cvc: _.toString(req.body.card.cvc)
+			},
+			currency: req.body.currency
 		};
-
-	findDocuments(database, { 'stores.id': ObjectId(store_id) }, {'stores': true}, function(doc) {
-		var store = doc[0].stores,
-			paymentMethod = store.paymentMethod;
-		if(paymentMethod["_id"] == 'SIMPLIFY') {
-			simplifyPayment(paymentMethod, data)
+		console.log('store_id:', store_id);
+		console.log('data:', data);
+		console.log('card:', data.card);
+	findDocuments(database, { 'stores.id': ObjectId(store_id) }, {'stores.paymentMethod': true}, function(doc) {
+		var  store = doc[0].stores[0];
+		console.log('store:', store);
+		console.log('paymentMethod:', store.paymentMethod);
+		if(store.paymentMethod["id"] == 'SIMPLIFY') {
+			simplifyPayment(store.paymentMethod, data)
 		} 
 	});
 	
@@ -333,12 +338,12 @@ var simplifyPayment = function(key, data) {
 	client.payment.create( transactionData, function(errData, data) {
 		if(errData) {
 			console.error("Error Message:", errData.data.error.message);
-			res.send("Payment Status:", JSON.stringify(errData));
+//			res.send("Payment Status:", JSON.stringify(errData));
 			return;
 		}
 
 		console.log("Payment Status:", data.paymentStatus);
-		res.send("Payment Status:", JSON.stringify(errData));
+//		res.send("Payment Status:", JSON.stringify(errData));
 	})
 }
 
@@ -355,21 +360,6 @@ app.get(path + '/test/insertTestUser', function(req, res) {
 		stores: [
 			{
 				id: ObjectId(),
-				name: 'Store 1',
-				description: 'Most awesome store!',
-				address: '25 millstead',
-				location: {
-					    latitude: 53.35487382895707,
-    					longitude: -6.279025369998967
-				},
-				paymentMethod: {
-						_id: 'STRIPE',
-						publicKey: 'sbpb_MmVmOGUyNDgtNThjYy00MTZhLWI4YTMtNTIzMDVkZGE5Mjlh',
-				},
-				products: []
-			},
-			{
-				id: ObjectId(),
 				name: 'Store 2',
 				description: 'Most awesome store!',
 				address: '25 millstead',
@@ -378,7 +368,7 @@ app.get(path + '/test/insertTestUser', function(req, res) {
 					longitude: -6.267085527951536
 				},
 				paymentMethod: {
-					_id: 'SIMPLIFY',
+					id: 'SIMPLIFY',
 					publicKey: 'sbpb_N2ZjYTQ2NWUtZTVlMC00MDJiLTgyOGMtODYxMjM3OTY1MWVh',
 					privateKey: 'qY1HX8kEexQ/uKRTPloEMIRZj8hLBFD5yIVbI5NjY555YFFQL0ODSXAOkNtXTToq'
 				},
