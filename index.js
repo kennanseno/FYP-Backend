@@ -319,17 +319,20 @@ app.post(path + '/pay', function(req, res) {
 
 		console.log('result:', result);
 		if(result.paymentMethod.id == 'SIMPLIFY') {
-			var payment = simplifyPayment(result.paymentMethod, data);
-			res.send(payment);
+			simplifyPayment(result.paymentMethod, data, function(result) {
+				res.send(result);
+			});
+			
 		} else if(result.paymentMethod.id == 'STRIPE') {
-			var payment = stripePayment(result.paymentMethod, data);
-			res.send(payment);
+			simplifyPayment(result.paymentMethod, data, function(result) {
+				res.send(result);
+			});
 		}
 	});
 	
 });
 
-var stripePayment = function(key, data) {
+var stripePayment = function(key, data, callback) {
 	var stripe = require("stripe")(key.privateKey);
 
 	stripe.tokens.create({
@@ -347,11 +350,11 @@ var stripePayment = function(key, data) {
 			source: token.id,
 		},  function(err, charge) {
 			if(err) {
-				return err;
+				callback(err);
 			}
 			if(charge) {
 				removeFromCart(data.username, 'ALL');
-				return charge;
+				callback(charge);
 			}
 		});
 	});
@@ -378,13 +381,13 @@ var simplifyPayment = function(key, data) {
 	client.payment.create( transactionData, function(errData, successData) {
 		if(errData) {
 			console.error("Error Message:", errData.data.error.message);
-			return JSON.stringify(errData);
+			callback(JSON.stringify(errData));
 		}
 		if(successData) {
 			removeFromCart(username, 'ALL');
 		}
 
-		return JSON.stringify(successData);
+		callback(JSON.stringify(successData));
 	})
 };
 
