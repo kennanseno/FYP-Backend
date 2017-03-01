@@ -9,7 +9,8 @@
     "geolib": "^2.0.22",
     "lodash": "^4.17.4",
     "mongodb": "^2.2.11",
-    "simplify-commerce": "^1.6.0"
+    "simplify-commerce": "^1.6.0",
+    "stripe": "^4.15.0"
   },
   "devDependencies": {},
   "scripts": {

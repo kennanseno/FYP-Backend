@@ -292,7 +292,7 @@ app.get(path + '/productExists', function(req, res) {
 
 //change to  aggregate to find store
 app.post(path + '/pay', function(req, res) {
-	var store_id = req.body.store_id,
+	var store_id = req.body.store_id;
 		data = {
 			amount: _.toString(req.body.amount),
 			description: 'TEST',
@@ -307,16 +307,46 @@ app.post(path + '/pay', function(req, res) {
 		console.log('store_id:', store_id);
 		console.log('data:', data);
 		console.log('card:', data.card);
-	findDocuments(database, { 'stores.id': ObjectId(store_id) }, {'stores.paymentMethod': true}, function(doc) {
-		var  store = doc[0].stores[0];
-		console.log('store:', store);
-		console.log('paymentMethod:', store.paymentMethod);
-		if(store.paymentMethod["id"] == 'SIMPLIFY') {
-			simplifyPayment(store.paymentMethod, data)
-		} 
+
+	var params = [
+		{ $unwind: '$stores' },
+		{ $match: { 'stores.id': ObjectId(req.body.store_id) } },
+		{ $project: { 'username': '$username', 'store_id': '$stores.id', 'paymentMethod': '$stores.paymentMethod' }}
+	];
+	aggregate(database, params, function(doc) {
+		var result = doc[0];
+
+		console.log('result:', result);
+		if(result.paymentMethod.id == 'SIMPLIFY') {
+			simplifyPayment(result.paymentMethod, data)
+		} else if(result.paymentMethod.id == 'STRIPE') {
+			stripePayment(result.paymentMethod, data)	
+		}
 	});
 	
 });
+
+var stripePayment = function(key, data) {
+	var stripe = require("stripe")(key.publicKey);
+
+	stripe.tokens.create({
+		card: {
+			"number": data.card.number,
+			"exp_month": data.card.expMonth,
+			"exp_year": data.card.expYear,
+			"cvc": data.card.cvc
+		}
+	}, function(err, token) {
+		stripe.charges.create({
+			amount: data.amount,
+			currency: data.currency,
+			description: data.description,
+			source: token,
+		},  function(err, charge) {
+			console.log('Stripe charge:', charge);
+		});
+	});
+}
 
 var simplifyPayment = function(key, data) {
 	client = Simplify.getClient({
@@ -326,7 +356,7 @@ var simplifyPayment = function(key, data) {
 
 	transactionData = {
 		amount: data.amount,
-		currency: data.currency, // only support 1 currency for now
+		currency: data.currency,
 		card: {
 			number: data.card.number,
 			expMonth: data.card.expMonth,
@@ -358,6 +388,21 @@ app.get(path + '/test/insertTestUser', function(req, res) {
 		address: '25 test St., Test',
 		cart: {},
 		stores: [
+			{
+				id: ObjectId(),
+				name: 'Store 1',
+				description: 'Store 1',
+				address: '24 millstead',
+				location: {
+					latitude: 53.33785738724721,
+					longitude: -6.267085527951525
+				},
+				paymentMethod: {
+					id: 'STRIPE',
+					publicKey: 'pk_test_Aaj7yDk5sGdshHsOM9qCXCAY'
+				},
+				products: []
+			},
 			{
 				id: ObjectId(),
 				name: 'Store 2',
