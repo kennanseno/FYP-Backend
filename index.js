@@ -394,8 +394,8 @@ app.get(path + '/test/insertTestUser', function(req, res) {
 				description: 'Store 1',
 				address: '24 millstead',
 				location: {
-					latitude: 53.33785738724721,
-					longitude: -6.267085527951525
+					latitude: 53.35487382895707,
+   					longitude: -6.279025369998967
 				},
 				paymentMethod: {
 					id: 'STRIPE',
