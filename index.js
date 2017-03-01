@@ -327,7 +327,7 @@ app.post(path + '/pay', function(req, res) {
 });
 
 var stripePayment = function(key, data) {
-	var stripe = require("stripe")(key.publicKey);
+	var stripe = require("stripe")(key.privateKey);
 
 	stripe.tokens.create({
 		card: {
@@ -400,7 +400,7 @@ app.get(path + '/test/insertTestUser', function(req, res) {
 				},
 				paymentMethod: {
 					id: 'STRIPE',
-					publicKey: 'sk_test_nDM3e0g8GR0a7xcnTvVB0DOf'
+					privateKey: 'sk_test_nDM3e0g8GR0a7xcnTvVB0DOf'
 				},
 				products: []
 			},
