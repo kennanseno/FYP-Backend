@@ -324,7 +324,7 @@ app.post(path + '/pay', function(req, res) {
 			});
 			
 		} else if(result.paymentMethod.id == 'STRIPE') {
-			simplifyPayment(result.paymentMethod, data, function(result) {
+			stripePayment(result.paymentMethod, data, function(result) {
 				res.send(result);
 			});
 		}
@@ -360,7 +360,7 @@ var stripePayment = function(key, data, callback) {
 	});
 };
 
-var simplifyPayment = function(key, data) {
+var simplifyPayment = function(key, data, callback) {
 	var username = data.username;
 	client = Simplify.getClient({
 		publicKey: key.publicKey,
@@ -380,7 +380,7 @@ var simplifyPayment = function(key, data) {
 
 	client.payment.create( transactionData, function(errData, successData) {
 		if(errData) {
-			console.error("Error Message:", errData.data.error.message);
+		//	console.error("Error Message:", errData.data.error.message);
 			callback(JSON.stringify(errData));
 		}
 		if(successData) {
