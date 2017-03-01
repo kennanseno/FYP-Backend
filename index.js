@@ -341,7 +341,7 @@ var stripePayment = function(key, data) {
 			amount: data.amount,
 			currency: data.currency,
 			description: data.description,
-			source: token,
+			source: token.id,
 		},  function(err, charge) {
 			console.log('Error:', err);
 			console.log('Stripe charge:', charge);
