@@ -294,6 +294,7 @@ app.get(path + '/productExists', function(req, res) {
 app.post(path + '/pay', function(req, res) {
 	var store_id = req.body.store_id;
 		data = {
+			username: req.body.username,
 			amount: _.toString(req.body.amount),
 			description: 'TEST',
 			card: {
@@ -318,9 +319,11 @@ app.post(path + '/pay', function(req, res) {
 
 		console.log('result:', result);
 		if(result.paymentMethod.id == 'SIMPLIFY') {
-			simplifyPayment(result.paymentMethod, data)
+			var payment = simplifyPayment(result.paymentMethod, data);
+			res.send(payment);
 		} else if(result.paymentMethod.id == 'STRIPE') {
-			stripePayment(result.paymentMethod, data)	
+			var payment = stripePayment(result.paymentMethod, data);
+			res.send(payment);
 		}
 	});
 	
@@ -343,13 +346,19 @@ var stripePayment = function(key, data) {
 			description: data.description,
 			source: token.id,
 		},  function(err, charge) {
-			console.log('Error:', err);
-			console.log('Stripe charge:', charge);
+			if(err) {
+				return err;
+			}
+			if(charge) {
+				removeFromCart(data.username, 'ALL');
+				return charge;
+			}
 		});
 	});
-}
+};
 
 var simplifyPayment = function(key, data) {
+	var username = data.username;
 	client = Simplify.getClient({
 		publicKey: key.publicKey,
 		privateKey: key.privateKey
@@ -366,17 +375,32 @@ var simplifyPayment = function(key, data) {
 		}
 	}
 
-	client.payment.create( transactionData, function(errData, data) {
+	client.payment.create( transactionData, function(errData, successData) {
 		if(errData) {
 			console.error("Error Message:", errData.data.error.message);
-//			res.send("Payment Status:", JSON.stringify(errData));
-			return;
+			return JSON.stringify(errData);
+		}
+		if(successData) {
+			removeFromCart(username, 'ALL');
 		}
 
-		console.log("Payment Status:", data.paymentStatus);
-//		res.send("Payment Status:", JSON.stringify(errData));
+		return JSON.stringify(successData);
 	})
-}
+};
+
+var removeFromCart = function(username, data) {
+	if(data == 'ALL') {
+		var data = { 
+				$set: { 
+					cart: {}
+				}
+		};
+
+		updateDocuments(database, {username: username}, data, function(result) {
+			console.log('Cart removed!');
+		});
+	}
+};
 
 /* ------------ TEST CODE -------------------- */
 
