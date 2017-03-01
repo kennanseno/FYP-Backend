@@ -317,11 +317,10 @@ app.post(path + '/pay', function(req, res) {
 	aggregate(database, params, function(doc) {
 		var result = doc[0];
 
-		console.log('result:', result);
 		if(result.paymentMethod.id == 'SIMPLIFY') {
 			simplifyPayment(result.paymentMethod, data, function(error, result) {
 				if(error) {
-					rese.send(error);
+					res.send(error);
 				}
 				res.send(result);
 			});
@@ -329,7 +328,7 @@ app.post(path + '/pay', function(req, res) {
 		} else if(result.paymentMethod.id == 'STRIPE') {
 			stripePayment(result.paymentMethod, data, function(error, result) {
 				if(error) {
-					rese.send(error);
+					res.send(error);
 				}
 				res.send(result);
 			});
