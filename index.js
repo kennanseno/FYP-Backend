@@ -343,6 +343,7 @@ var stripePayment = function(key, data) {
 			description: data.description,
 			source: token,
 		},  function(err, charge) {
+			console.log('Error:', err);
 			console.log('Stripe charge:', charge);
 		});
 	});
@@ -399,7 +400,7 @@ app.get(path + '/test/insertTestUser', function(req, res) {
 				},
 				paymentMethod: {
 					id: 'STRIPE',
-					publicKey: 'pk_test_Aaj7yDk5sGdshHsOM9qCXCAY'
+					publicKey: 'sk_test_nDM3e0g8GR0a7xcnTvVB0DOf'
 				},
 				products: []
 			},
