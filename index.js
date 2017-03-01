@@ -290,7 +290,6 @@ app.get(path + '/productExists', function(req, res) {
 	});
 });
 
-//change to  aggregate to find store
 app.post(path + '/pay', function(req, res) {
 	var store_id = req.body.store_id;
 		data = {
@@ -395,6 +394,24 @@ var simplifyPayment = function(key, data, callback) {
 	})
 };
 
+app.post(path + '/removeFromCart', function(req, res) {
+	var params = {
+		'username': req.body.username
+	},
+	data = { 
+		$pull: { 
+			'cart.products': {
+				'product_id': req.body.product_id 
+			} 
+		}
+	};
+
+	updateDocuments(database, params, data, function(result) {
+		res.send(result.result)
+	});
+});
+
+
 var removeFromCart = function(username, data) {
 	if(data == 'ALL') {
 		var data = { 
@@ -406,7 +423,6 @@ var removeFromCart = function(username, data) {
 		updateDocuments(database, {username: username}, data, function(result) {
 			console.log('Cart removed!');
 		});
-	}
 };
 
 /* ------------ TEST CODE -------------------- */
