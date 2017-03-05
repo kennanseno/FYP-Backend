@@ -277,6 +277,8 @@ app.get(path + '/getCartData', function(req, res) {
 	});
 });
 
+var 
+
 app.get(path + '/productExists', function(req, res) {
 	var params = [
 		{ $unwind: '$stores' },
@@ -301,7 +303,10 @@ app.get(path + '/productSuggestion', function(req, res) {
 		username = req.body.username;
 
 		getUserTransactionHistory({ username: username }, function(transaction) {
-			res.send(transaction);
+			getStoreProducts(store_id, function(products) {
+				var newProducts = _.sortBy(products, [function(o) { return o.date_created; }]);
+				res.send(newProducts);
+			});
 		});
 });
 
@@ -312,8 +317,21 @@ var getUserTransactionHistory = function(info, callback) {
 	if (!_.isUndefined(info.store_id)) data.store_id = info.store_id; 
 
 	findDocuments(database, transactionCollection, data, {}, function(result) {
+		
 		callback(result);
 	});
+}
+
+var getStoreProducts = function(store_id, callback) {
+	var params = [
+		{ $unwind: '$stores' },
+		{ $match: {'stores.id': ObjectId(store_id) } },
+		{ $project: { 'products': '$stores.products' } }
+	];
+
+	aggregate(database, collectionUsed, params, function(products) {
+		callback(products);
+	})
 }
 
 app.post(path + '/pay', function(req, res) {
