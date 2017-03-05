@@ -296,6 +296,26 @@ app.get(path + '/productExists', function(req, res) {
 	});
 });
 
+app.post(path + '/productSuggestion', function(req, res) {
+	var store_id = req.body.store_id,
+		username = req.body.username;
+
+		getUserTransactionHistory({ username: username }, function(transaction) {
+			res.send(transaction);
+		});
+});
+
+var getUserTransactionHistory = function(info, callback) {
+	var data = { username: info.username };
+
+	//if store_id is passed
+	if (!_.isUndefined(info.store_id)) data.store_id = info.store_id; 
+
+	findDocuments(database, transactionCollection, data, params, function(result) {
+		callback(result);
+	});
+}
+
 app.post(path + '/pay', function(req, res) {
 	var store_id = req.body.store_id;
 		data = {
@@ -409,7 +429,7 @@ var saveTransaction = function(data) {
 		id: ObjectId(),
 		username: data.username,
 		store_id: data.store_id,
-		date: moment.now(),
+		transaction_date: moment.now(),
 		amount: data.amount,
 		currency: data.currency,
 		products: data.products
@@ -459,6 +479,7 @@ app.get(path + '/test/insertTestUser', function(req, res) {
 		username: 'test',
 		email: 'test@test.com',
 		password: 'test',
+		date_joined: moment.now(),
 		name: 'Test Test',
 		address: '25 test St., Test',
 		cart: {},
@@ -468,6 +489,7 @@ app.get(path + '/test/insertTestUser', function(req, res) {
 				name: 'Store 1',
 				description: 'Store 1',
 				address: '24 millstead',
+				date_created: moment.now(),
 				location: {
 					latitude: 53.35487382895707,
    					longitude: -6.279025369998967
@@ -483,6 +505,7 @@ app.get(path + '/test/insertTestUser', function(req, res) {
 				name: 'Store 2',
 				description: 'Most awesome store!',
 				address: '25 millstead',
+				date_created: moment.now(),
 				location: {
 					latitude: 53.33785738724761,
 					longitude: -6.267085527951536
