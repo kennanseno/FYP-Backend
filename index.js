@@ -296,7 +296,7 @@ app.get(path + '/productExists', function(req, res) {
 	});
 });
 
-app.post(path + '/productSuggestion', function(req, res) {
+app.get(path + '/productSuggestion', function(req, res) {
 	var store_id = req.body.store_id,
 		username = req.body.username;
 
@@ -426,7 +426,6 @@ var simplifyPayment = function(key, data, callback) {
 
 var saveTransaction = function(data) {
 	var transactionData = {
-		id: ObjectId(),
 		username: data.username,
 		store_id: data.store_id,
 		transaction_date: moment.now(),
