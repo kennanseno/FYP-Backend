@@ -119,6 +119,7 @@ app.post(path + '/registerUser', function(req, res) {
 		username: req.body.username,
 		email: req.body.email,
 		password: req.body.password,
+		date_joined: moment.now(),
 		name: req.body.name,
 		address: req.body.address,
 		cart: {},
@@ -141,6 +142,7 @@ app.post(path + '/createStore', function(req, res) {
 					description: req.body.description,
 					address: req.body.address,
 					location: req.body.location,
+					date_created: moment.now(),
 					products: []
 				} 
 			}
@@ -161,6 +163,7 @@ app.post(path + '/addProduct', function(req, res) {
 				'_id': productData.code,
 				'name': productData.name,
 				'description': productData.description,
+				'date_created': moment.now(),
 				'price': productData.price,
 				'tags': productData.tags
 			} 
@@ -413,7 +416,7 @@ var saveTransaction = function(data) {
 	}
 
 	insertDocument(database, transactionCollection, transactionData, function(result) {
-
+		console.log('Transaction saved!');
 	});
 }
 
