@@ -159,7 +159,8 @@ app.post(path + '/addProduct', function(req, res) {
 				'_id': productData.code,
 				'name': productData.name,
 				'description': productData.description,
-				'price': productData.price
+				'price': productData.price,
+				'tags': productData.tags
 			} 
 		}
 	};
