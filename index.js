@@ -424,6 +424,7 @@ var removeFromCart = function(username, data) {
 		updateDocuments(database, {username: username}, data, function(result) {
 			console.log('Cart removed!');
 		});
+	}
 };
 
 /* ------------ TEST CODE -------------------- */
