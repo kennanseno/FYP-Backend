@@ -563,6 +563,13 @@ app.get(path + '/test/removeAllUsers', function(req, res) {
 	});
 });
 
+app.get(path + '/test/clearTransactions', function(req, res) {
+	var data = {}
+	removeDocument(database, transactionCollection, data, function(docs) {
+		res.send('transactions deleted!');
+	});
+});
+
 /* ------------ UTIL FUNCTIONS ------------- */
 
 var insertDocument = function(db, collection, data, callback) {
