@@ -48,3 +48,10 @@ database/mongo/*
 
 # Output of 'npm pack'
 *.tgz
+
+#VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
