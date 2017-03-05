@@ -7,6 +7,7 @@ var ObjectId = require('mongodb').ObjectID;
 var assert = require('assert');
 var geolib = require('geolib');
 var Simplify = require("simplify-commerce");
+var moment = require('moment');
 
 app.use(bodyParser());
 app.use(express.static('public'));
@@ -403,7 +404,9 @@ var simplifyPayment = function(key, data, callback) {
 var saveTransaction = function(data) {
 	var transactionData = {
 		id: ObjectId(),
+		username: data.username,
 		store_id: data.store_id,
+		date: moment.now(),
 		amount: data.amount,
 		currency: data.currency,
 		products: data.products
