@@ -19,6 +19,7 @@ var mongoUrl = 'mongodb://localhost:3001/FYP',
 
 var DEV_MODE = true; //IF ON DEV PHASE
 var collectionUsed = DEV_MODE ? TEST_COLLECTION : PROD_COLLECTION;
+var transactionCollection = DEV_MODE ? 'test_transaction' : 'transaction';
 
 MongoClient.connect(mongoUrl, function(err, db) {
 	if(err) {
@@ -44,7 +45,7 @@ app.get(path + '/findUser', function(req, res) {
 		address: true
 	};
 
-	findDocuments(database, data, params, function(docs) {
+	findDocuments(database, collectionUsed, data, params, function(docs) {
 		res.send(docs);	
 	});
 });
@@ -58,7 +59,7 @@ app.get(path + '/getStore', function(req, res) {
 		stores: true
 	};
 
-	findDocuments(database, data, params, function(docs) {
+	findDocuments(database, collectionUsed, data, params, function(docs) {
 		res.send(docs);	
 	});
 });
@@ -71,7 +72,7 @@ app.get(path + '/getStoreDetails', function(req, res) {
 		{ $project: {'products': '$stores.products', 'paymentMethod': '$stores.paymentMethod.id'} }
 	];
 
-	aggregate(database, params, function(docs) {
+	aggregate(database, collectionUsed, params, function(docs) {
 		res.send(docs);	
 	});
 });
@@ -92,7 +93,7 @@ app.get(path + '/searchNearbyStores', function(req, res) {
 		}
 	];
 
-	aggregate(database, params, function(docs) {
+	aggregate(database, collectionUsed, params, function(docs) {
 		var result = [];
 		docs.forEach(function(store) {
 			var distance = geolib.getDistance(
@@ -123,7 +124,7 @@ app.post(path + '/registerUser', function(req, res) {
 		stores: []
 	};
 
-	insertDocument(database, data, function(result) {
+	insertDocument(database, collectionUsed, data, function(result) {
 		console.log('New User added!');
 		res.send(result.result);
 	});
@@ -143,7 +144,7 @@ app.post(path + '/createStore', function(req, res) {
 				} 
 			}
 		};
-	updateDocuments(database, params, data, function(result) {
+	updateDocuments(database, collectionUsed, params, data, function(result) {
 		res.send(result.result)
 	});
 });
@@ -165,7 +166,7 @@ app.post(path + '/addProduct', function(req, res) {
 		}
 	};
 
-	updateDocuments(database, params, data, function(result) {
+	updateDocuments(database, collectionUsed, params, data, function(result) {
 		res.send(result.result)
 	});
 });
@@ -175,7 +176,7 @@ app.post(path + '/addToCart', function(req, res) {
 		'username': req.body.username
 	};
 
-	findDocuments(database, params, { 'cart': true }, function(doc) {
+	findDocuments(database, collectionUsed, params, { 'cart': true }, function(doc) {
 		var productData = req.body.data;
 		var data;
 
@@ -202,7 +203,7 @@ app.post(path + '/addToCart', function(req, res) {
 				}
 			}
 		}
-		updateDocuments(database, params, data, function(result) {
+		updateDocuments(database, collectionUsed, params, data, function(result) {
 			res.send(result.result)
 		});
 	});
@@ -218,7 +219,7 @@ app.post(path + '/addPaymentMethod', function(req, res) {
 		$set: { 'stores.$.paymentMethod' : req.body.key }
 	};
 	
-	updateDocuments(database, params, data, function(result) {
+	updateDocuments(database, collectionUsed, params, data, function(result) {
 		res.send(result.result)
 	});
 });
@@ -228,7 +229,7 @@ app.get(path + '/removeUser', function(req, res) {
 		username: req.query.username
 	};
 
-	removeDocument(database, data, function(result) {
+	removeDocument(database, collectionUsed, data, function(result) {
 		res.send(data.username + ' successfully removed!');
 	});
 });
@@ -241,7 +242,7 @@ app.get(path + '/getCartData', function(req, res) {
 	var data = { username: req.query.username };	
 	var params = { cart: true };
 	
-	findDocuments(database, data, params, function(docs) {
+	findDocuments(database, collectionUsed, data, params, function(docs) {
 		var cart = docs[0].cart;
 		var result= {
 			store_id: cart.store_id,
@@ -258,7 +259,7 @@ app.get(path + '/getCartData', function(req, res) {
 				{ $match: {'products._id': object.product_id } }
 			];
 
-			aggregate(database, params, function(details) {
+			aggregate(database, collectionUsed, params, function(details) {
 				details[0].products.quantity = object.quantity; //inject quantity of each product in cart. FIND BETTER SOLUTION!
 				
 				//hack for now to add store owner/name
@@ -281,7 +282,7 @@ app.get(path + '/productExists', function(req, res) {
 		{ $match: { 'products._id': req.query.product_id} }
 	];
 
-	aggregate(database, params, function(docs) {
+	aggregate(database, collectionUsed, params, function(docs) {
 		//returns false if no documents exist
 		if(docs.length === 0) {
 			res.send(false);
@@ -295,15 +296,17 @@ app.post(path + '/pay', function(req, res) {
 	var store_id = req.body.store_id;
 		data = {
 			username: req.body.username,
+			store_id: req.body.store_id,
 			amount: _.toString(req.body.amount),
+			currency: req.body.currency,
 			description: 'TEST',
+			products: req.body.products,
 			card: {
 				number: req.body.card.number.replace(/ /g, ""),
 				expMonth: req.body.card.expiration.slice(0, 2),
 				expYear: req.body.card.expiration.slice(3, 5),
 				cvc: _.toString(req.body.card.cvc)
-			},
-			currency: req.body.currency
+			}
 		};
 		console.log('store_id:', store_id);
 		console.log('data:', data);
@@ -314,7 +317,7 @@ app.post(path + '/pay', function(req, res) {
 		{ $match: { 'stores.id': ObjectId(req.body.store_id) } },
 		{ $project: { 'username': '$username', 'store_id': '$stores.id', 'paymentMethod': '$stores.paymentMethod' }}
 	];
-	aggregate(database, params, function(doc) {
+	aggregate(database, collectionUsed, params, function(doc) {
 		var result = doc[0];
 
 		if(result.paymentMethod.id == 'SIMPLIFY') {
@@ -358,6 +361,7 @@ var stripePayment = function(key, data, callback) {
 				callback(error);
 			}
 			if(charge) {
+				saveTransaction(data);
 				removeFromCart(data.username, 'ALL');
 				callback(null, charge);
 			}
@@ -388,12 +392,27 @@ var simplifyPayment = function(key, data, callback) {
 			callback(errData);
 		}
 		if(successData) {
+			saveTransaction(data);
 			removeFromCart(username, 'ALL');
 		}
 
 		callback(null, successData);
 	})
 };
+
+var saveTransaction = function(data) {
+	var transactionData = {
+		id: ObjectId(),
+		store_id: data.store_id,
+		amount: data.amount,
+		currency: data.currency,
+		products: data.products
+	}
+
+	insertDocument(database, transactionCollection, transactionData, function(result) {
+
+	});
+}
 
 app.post(path + '/removeFromCart', function(req, res) {
 	var params = {
@@ -407,7 +426,7 @@ app.post(path + '/removeFromCart', function(req, res) {
 		}
 	};
 
-	updateDocuments(database, params, data, function(result) {
+	updateDocuments(database, collectionUsed, params, data, function(result) {
 		res.send(result.result)
 	});
 });
@@ -421,7 +440,7 @@ var removeFromCart = function(username, data) {
 				}
 		};
 
-		updateDocuments(database, {username: username}, data, function(result) {
+		updateDocuments(database, collectionUsed, {username: username}, data, function(result) {
 			console.log('Cart removed!');
 		});
 	}
@@ -472,7 +491,7 @@ app.get(path + '/test/insertTestUser', function(req, res) {
 		]
 	};
 
-	insertDocument(database, testUser, function(result) {
+	insertDocument(database, collectionUsed, testUser, function(result) {
 		res.send('Test user Added!');
 	});
 });
@@ -480,7 +499,7 @@ app.get(path + '/test/insertTestUser', function(req, res) {
 app.get(path + '/test/removeTestUser', function(req, res) {
 	var testUser = {username: 'test', password: 'test'};
 
-	removeDocument(database, testUser, function(result) {
+	removeDocument(database, collectionUsed, testUser, function(result) {
 		res.send(result);
 	});
 
@@ -492,60 +511,72 @@ app.get(path + '/test/find', function(req, res) {
 			password: false
 		};
 
-	findDocuments(database, data, params, function(docs) {
+	findDocuments(database, collectionUsed, data, params, function(docs) {
 		res.send(docs);
 	});
 });
 
+app.get(path + '/test/transactions', function(req, res) {
+	var data = {},
+		params = {};
+	
+	if(!_.isUndefined(req.body.store_id)) data.store_id = req.body.store_id;
+
+	findDocuments(database, transactionCollection, data, params, function(docs) {
+		res.send(docs);
+	});
+});
+
+
 app.get(path + '/test/removeAllUsers', function(req, res) {
 	var data = {}
-	removeDocument(database, data, function(docs) {
+	removeDocument(database, collectionUsed, data, function(docs) {
 		res.send('All users deleted!');
 	});
 });
 
 /* ------------ UTIL FUNCTIONS ------------- */
 
-var insertDocument = function(db, data, callback) {
-	var collection = db.collection(collectionUsed);
+var insertDocument = function(db, collection, data, callback) {
+	var col = db.collection(collection);
 
-	collection.insert([data], function(err, result) {
+	col.insert([data], function(err, result) {
 		assert.equal(err, null);
 		callback(result);
 	});
 }
 
-var removeDocument = function(db, data, callback) {
-	var collection = db.collection(collectionUsed);
+var removeDocument = function(db, collection, data, callback) {
+	var col = db.collection(collection);
 
-	collection.remove(data, function(err, result) {
+	col.remove(data, function(err, result) {
 		assert.equal(err, null);
 		callback(result);
 	});
 }
 
-var findDocuments = function(db, data, params, callback) {
-	var collection = db.collection(collectionUsed);
+var findDocuments = function(db, collection, data, params, callback) {
+	var col = db.collection(collection);
 	
-	collection.find(data, params).toArray(function(err, docs) {
+	col.find(data, params).toArray(function(err, docs) {
 		assert.equal(err, null);
 		callback(docs);
 	});
 }
 
-var updateDocuments = function(db, params, data, callback) {
-	var collection = db.collection(collectionUsed);
+var updateDocuments = function(db, collection, params, data, callback) {
+	var col = db.collection(collection);
 
-	collection.update(params, data, function(err, result) {
+	col.update(params, data, function(err, result) {
 		assert.equal(err, null);
 		callback(result);
 	});
 }
 
-var aggregate = function(db, params, callback) {
-	var collection = db.collection(collectionUsed);
+var aggregate = function(db, collection, params, callback) {
+	var col = db.collection(collection);
 
-	collection.aggregate(params, function(err, result) {
+	col.aggregate(params, function(err, result) {
 		assert.equal(err, null);
 		callback(result);
 	});
