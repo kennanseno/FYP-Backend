@@ -311,7 +311,7 @@ var getUserTransactionHistory = function(info, callback) {
 	//if store_id is passed
 	if (!_.isUndefined(info.store_id)) data.store_id = info.store_id; 
 
-	findDocuments(database, transactionCollection, data, params, function(result) {
+	findDocuments(database, transactionCollection, data, {}, function(result) {
 		callback(result);
 	});
 }
