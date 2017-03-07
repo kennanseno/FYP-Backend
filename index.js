@@ -489,6 +489,19 @@ var removeFromCart = function(username, data) {
 
 /* ------------ TEST CODE -------------------- */
 
+app.get('/testData', function(req, res) {
+	var fs = require("fs");
+	var userData = fs.readFileSync("testData/userData.json");
+	var transactionData = fs.readFileSync("testData/transactionData.json");
+	res.send( _.concat(JSON.parse(userData), JSON.parse(transactionData)) );
+	
+	insertDocument(database, collectionUsed, userData, function(userDoc) {
+		insertDocument(database, collectionUsed, transactionData, function(transactionDoc) {
+			res.send('Test Data populated!');
+		});
+	});
+});
+
 app.get(path + '/test/insertTestUser', function(req, res) {
 	var testUser = {
 		username: 'test',
