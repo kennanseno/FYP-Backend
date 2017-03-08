@@ -303,17 +303,28 @@ app.get(path + '/productSuggestion', function(req, res) {
 		getUserTransactionHistory({ username: username, store_id: store_id}, function(transactions) {
 			getStoreProducts(store_id, function(products) {
 
+				var tagCount = {};
 				transactions.forEach(function(transaction) {
 					transaction.products.forEach(function(product_id) {
 
 						//find product object with the product id
-						var currentProduct = _.find(products, function(product) { return product.id = product_id });
-						console.log('transaction products:', currentProduct);
+						var productInTransaction = _.find(products, function(product) { return product.id = product_id });
+						productInTransaction.tags.forEach(function(tag) {
+							var tagCountkeys = Object.keys(tagCount);
+
+							//check if tag is already in tags object
+							if(_.includes(tagCountkeys, tag)) {
+								tagCount[tag] = tagCount[tag] + 1;
+							} else {
+								tagCount[tag] = 1;
+							}
+						});
+						console.log('tagCount:', tagCount);
 					})
 				});
-
+				res.send(tagCount);
 				var newProducts = _.sortBy(products, [function(o) { return o.date_created; }]).reverse();
-				res.send(transactions);
+				//res.send(transactions);
 			});
 		});
 });
