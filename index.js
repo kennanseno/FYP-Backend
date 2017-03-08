@@ -301,11 +301,12 @@ app.get(path + '/productSuggestion', function(req, res) {
 		username = req.query.username;
 
 		getUserTransactionHistory({ username: username, store_id: store_id}, function(transactions) {
+			console.log('transactions:', transactions);
 			getStoreProducts(store_id, function(products) {
-
+				console.log('products:', products);
 				transactions.forEach(function(transaction) {
 					transaction.products.forEach(function(product_id) {
-						
+
 						//find product object with the product id
 						var currentProduct = _.find(products, function(product) { return product.id = product_id });
 						console.log('transaction products:', currentProduct);
@@ -319,12 +320,7 @@ app.get(path + '/productSuggestion', function(req, res) {
 });
 
 var getUserTransactionHistory = function(info, callback) {
-	var data = { username: info.username };
-
-	//if store_id is passed
-	if (!_.isUndefined(info.store_id)) data.store_id = ObjectId(info.store_id); 
-
-	findDocuments(database, transactionCollection, data, {}, function(result) {
+	findDocuments(database, transactionCollection, { username: info.username, store_id: ObjectId(info.store_id)}, {}, function(result) {
 		callback(result);
 	});
 }
