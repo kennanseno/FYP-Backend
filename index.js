@@ -308,10 +308,9 @@ app.get(path + '/productSuggestion', function(req, res) {
 					transaction.products.forEach(function(product_id) {
 
 						//find product object with the product id
-						var productInTransaction = _.find(products, function(product) { return product.id = product_id });
+						var productInTransaction = _.find(products, function(product) { return product._id == product_id });
 						productInTransaction.tags.forEach(function(tag) {
 							var tagCountkeys = Object.keys(tagCount);
-
 							//check if tag is already in tags object
 							if(_.includes(tagCountkeys, tag)) {
 								tagCount[tag] = tagCount[tag] + 1;
@@ -319,7 +318,6 @@ app.get(path + '/productSuggestion', function(req, res) {
 								tagCount[tag] = 1;
 							}
 						});
-						console.log('tagCount:', tagCount);
 					})
 				});
 				res.send(tagCount);
