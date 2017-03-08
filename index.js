@@ -313,7 +313,7 @@ var getUserTransactionHistory = function(info, callback) {
 	var data = { username: info.username };
 
 	//if store_id is passed
-	if (!_.isUndefined(info.store_id)) data.store_id = info.store_id; 
+	if (!_.isUndefined(info.store_id)) data.store_id = ObjectId(info.store_id); 
 
 	findDocuments(database, transactionCollection, data, {}, function(result) {
 		callback(result);
@@ -489,14 +489,13 @@ var removeFromCart = function(username, data) {
 
 /* ------------ TEST CODE -------------------- */
 
-app.get('/testData', function(req, res) {
+app.get(path + '/test/testData', function(req, res) {
 	var fs = require("fs");
-	var userData = fs.readFileSync("testData/userData.json");
-	var transactionData = fs.readFileSync("testData/transactionData.json");
-	res.send( _.concat(JSON.parse(userData), JSON.parse(transactionData)) );
+	var userData = JSON.parse(fs.readFileSync("testData/userData.json"));
+	var transactionData = JSON.parse(fs.readFileSync("testData/transactionData.json"));
 	
 	insertDocument(database, collectionUsed, userData, function(userDoc) {
-		insertDocument(database, collectionUsed, transactionData, function(transactionDoc) {
+		insertDocument(database, transactionCollection, transactionData, function(transactionDoc) {
 			res.send('Test Data populated!');
 		});
 	});
@@ -603,8 +602,7 @@ app.get(path + '/test/clearTransactions', function(req, res) {
 
 var insertDocument = function(db, collection, data, callback) {
 	var col = db.collection(collection);
-
-	col.insert([data], function(err, result) {
+	col.insert(data, function(err, result) {
 		assert.equal(err, null);
 		callback(result);
 	});
