@@ -1,80 +1,47 @@
-[{
-    "_id": "58bc927f94dbcc09e2e91b5b",
-    "username": "test",
-    "store_id": "58b6dd7f22ae5a38a7ab53ef",
-    "transaction_date": 1488753279366,
-    "amount": "500",
-    "currency": "EUR",
-    "products": [
-        "3057640136993"
-    ]
-},
-{
-    "_id": "58bc931794dbcc09e2e91b5c",
-    "username": "test",
-    "store_id": "58b6dd7f22ae5a38a7ab53ef",
-    "transaction_date": 1488753431134,
-    "amount": "1500",
-    "currency": "EUR",
-    "products": [
-        "3057640136993"
-    ]
-},
-{
-    "_id": "58bc933594dbcc09e2e91b5d",
-    "username": "test",
-    "store_id": "58b6dd7f22ae5a38a7ab53ef",
-    "transaction_date": 1488753461456,
-    "amount": "3000",
-    "currency": "EUR",
-    "products": [
-        "3057640136993"
-    ]
-},
-{
-    "_id": "58bc96b694dbcc09e2e91b61",
-    "username": "test",
-    "store_id": "58bc946194dbcc09e2e91b5f",
-    "transaction_date": 1488754358188,
-    "amount": "1000",
-    "currency": "EUR",
-    "products": [
-        "3057640136993"
-    ]
-},
-{
-    "_id": "58bc96d394dbcc09e2e91b62",
-    "username": "test",
-    "store_id": "58bc946194dbcc09e2e91b5f",
-    "transaction_date": 1488754387176,
-    "amount": "3200",
-    "currency": "EUR",
-    "products": [
-        "3057640136993",
-        "5060335632777"
-    ]
-},
-{
-    "_id": "58bc970d94dbcc09e2e91b63",
-    "username": "test",
-    "store_id": "58bc946194dbcc09e2e91b5f",
-    "transaction_date": 1488754445846,
-    "amount": "2000",
-    "currency": "EUR",
-    "products": [
-        "5060335632777",
-        "9002490210991"
-    ]
-},
-{
-    "_id": "58bc973c94dbcc09e2e91b64",
-    "username": "test",
-    "store_id": "58bc946194dbcc09e2e91b5f",
-    "transaction_date": 1488754492462,
-    "amount": "2900",
-    "currency": "EUR",
-    "products": [
-        "9002490210991",
-        "3057640136993"
-    ]
-}]
+[
+    {
+        "_id": "58c0354ec7789936fb9293b3",
+        "username": "test",
+        "store_id": "58c033bc63e512356796fa3b",
+        "transaction_date": 1488991566470,
+        "amount": "1200",
+        "currency": "EUR",
+        "products": [
+            "5060335632777"
+        ]
+    },
+    {
+        "_id": "58c0358ac7789936fb9293b4",
+        "username": "test",
+        "store_id": "58c033bc63e512356796fa3b",
+        "transaction_date": 1488991626196,
+        "amount": "3000",
+        "currency": "EUR",
+        "products": [
+            "3057640136993"
+        ]
+    },
+    {
+        "_id": "58c035a1c7789936fb9293b5",
+        "username": "test",
+        "store_id": "58c033bc63e512356796fa3b",
+        "transaction_date": 1488991649596,
+        "amount": "1600",
+        "currency": "EUR",
+        "products": [
+            "9002490210991"
+        ]
+    },
+    {
+        "_id": "58c035e0c7789936fb9293b6",
+        "username": "test",
+        "store_id": "58c033bc63e512356796fa3b",
+        "transaction_date": 1488991712552,
+        "amount": "3400",
+        "currency": "EUR",
+        "products": [
+            "5060335632777",
+            "9002490210991"
+        ]
+    }
+]

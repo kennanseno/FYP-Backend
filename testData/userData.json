@@ -1,86 +1,81 @@
-{
-    "_id": "58bc946194dbcc09e2e91b60",
-    "username": "test",
-    "email": "test@test.com",
-    "date_joined": 1488753761300,
-    "name": "Test Test",
-    "address": "25 test St., Test",
-    "cart": {
-        "store_id": "58bc946194dbcc09e2e91b5f",
-        "products": [
+[
+    {
+        "_id": "58c033bc63e512356796fa3c",
+        "username": "test",
+        "email": "test@test.com",
+        "date_joined": 1488991164068,
+        "name": "Test Test",
+        "address": "25 test St., Test",
+        "cart": {},
+        "stores": [
             {
-                "product_id": "3057640136993",
-                "quantity": 1
+                "id": "58c033bc63e512356796fa3a",
+                "name": "Store 1",
+                "description": "Store 1",
+                "address": "24 millstead",
+                "date_created": 1488991164068,
+                "location": {
+                    "latitude": 53.35487382895707,
+                    "longitude": -6.279025369998967
+                },
+                "paymentMethod": {
+                    "id": "STRIPE",
+                    "privateKey": "sk_test_nDM3e0g8GR0a7xcnTvVB0DOf"
+                },
+                "products": []
+            },
+            {
+                "id": "58c033bc63e512356796fa3b",
+                "name": "Store 2",
+                "description": "Most awesome store!",
+                "address": "25 millstead",
+                "date_created": 1488991164069,
+                "location": {
+                    "latitude": 53.33785738724761,
+                    "longitude": -6.267085527951536
+                },
+                "paymentMethod": {
+                    "id": "SIMPLIFY",
+                    "publicKey": "sbpb_N2ZjYTQ2NWUtZTVlMC00MDJiLTgyOGMtODYxMjM3OTY1MWVh",
+                    "privateKey": "qY1HX8kEexQ/uKRTPloEMIRZj8hLBFD5yIVbI5NjY555YFFQL0ODSXAOkNtXTToq"
+                },
+                "products": [
+                    {
+                        "_id": "3057640136993",
+                        "name": "monster",
+                        "description": "monste",
+                        "date_created": 1488991421982,
+                        "price": 5,
+                        "tags": [
+                            "drinks",
+                            "energy drinks"
+                        ]
+                    },
+                    {
+                        "_id": "5060335632777",
+                        "name": "water",
+                        "description": "wster",
+                        "date_created": 1488991452026,
+                        "price": 3,
+                        "tags": [
+                            "drinks",
+                            "water"
+                        ]
+                    },
+                    {
+                        "_id": "9002490210991",
+                        "name": "Red bull",
+                        "description": "red bull",
+                        "date_created": 1488991503175,
+                        "price": 4,
+                        "tags": [
+                            "drinks",
+                            "water",
+                            "energy drinks"
+                        ]
+                    }
+                ]
             }
         ]
-    },
-    "stores": [
-        {
-            "id": "58bc946194dbcc09e2e91b5e",
-            "name": "Store 1",
-            "description": "Store 1",
-            "address": "24 millstead",
-            "date_created": 1488753761300,
-            "location": {
-                "latitude": 53.35487382895707,
-                "longitude": -6.279025369998967
-            },
-            "paymentMethod": {
-                "id": "STRIPE",
-                "privateKey": "sk_test_nDM3e0g8GR0a7xcnTvVB0DOf"
-            },
-            "products": []
-        },
-        {
-            "id": "58bc946194dbcc09e2e91b5f",
-            "name": "Store 2",
-            "description": "Most awesome store!",
-            "address": "25 millstead",
-            "date_created": 1488753761300,
-            "location": {
-                "latitude": 53.33785738724761,
-                "longitude": -6.267085527951536
-            },
-            "paymentMethod": {
-                "id": "SIMPLIFY",
-                "publicKey": "sbpb_N2ZjYTQ2NWUtZTVlMC00MDJiLTgyOGMtODYxMjM3OTY1MWVh",
-                "privateKey": "qY1HX8kEexQ/uKRTPloEMIRZj8hLBFD5yIVbI5NjY555YFFQL0ODSXAOkNtXTToq"
-            },
-            "products": [
-                {
-                    "_id": "3057640136993",
-                    "name": "Water 500ml",
-                    "description": "Water",
-                    "date_created": 1488754115286,
-                    "price": 5,
-                    "tags": [
-                        "drinks",
-                        "water"
-                    ]
-                },
-                {
-                    "_id": "9002490210991",
-                    "name": "Red Bull",
-                    "description": "Red bull",
-                    "date_created": 1488754224698,
-                    "price": 3,
-                    "tags": [
-                        "drinks",
-                        "energy drinks"
-                    ]
-                },
-                {
-                    "_id": "5060335632777",
-                    "name": "Monster",
-                    "description": "monster",
-                    "date_created": 1488754267213,
-                    "price": 4,
-                    "tags": [
-                        "drinks",
-                        "energy drinks"
-                    ]
-                }
-            ]
-        }
-    ]
-}
+    }
+]

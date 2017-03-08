@@ -300,11 +300,20 @@ app.get(path + '/productSuggestion', function(req, res) {
 	var store_id = req.query.store_id,
 		username = req.query.username;
 
-		getUserTransactionHistory({ username: username }, function(transaction) {
+		getUserTransactionHistory({ username: username, store_id: store_id}, function(transactions) {
 			getStoreProducts(store_id, function(products) {
+
+				transactions.forEach(function(transaction) {
+					transaction.products.forEach(function(product_id) {
+						
+						//find product object with the product id
+						var currentProduct = _.find(products, function(product) { return product.id = product_id });
+						console.log('transaction products:', currentProduct);
+					})
+				});
+
 				var newProducts = _.sortBy(products, [function(o) { return o.date_created; }]).reverse();
-				console.log('new products:', newProducts);
-				res.send(transaction);
+				res.send(transactions);
 			});
 		});
 });
