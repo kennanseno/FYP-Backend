@@ -303,8 +303,10 @@ app.get(path + '/productSuggestion', function(req, res) {
 		getUserTransactionHistory({ username: username, store_id: store_id }, function(transactions) {
 			getStoreProducts(store_id, function(products) {
 				tallyUserProductTags(transactions, products, function(tags) {
-					res.send(tags);
 					var newProducts = _.sortBy(products, [function(o) { return o.date_created; }]).reverse();
+					var topProductSuggestion = _.filter(products, function(product) { return _.includes(product.tags, tags[0].name)});
+					
+					res.send(tags);
 				});
 			});
 		});
