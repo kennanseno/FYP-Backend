@@ -305,19 +305,19 @@ app.get(path + '/productSuggestion', function(req, res) {
 				tallyUserProductTags(transactions, products, function(error, tags) {
 					if(error) {
 						res.send('Product Suggestion not Available!');
-						return;
 					}
-					
-					var productSuggestion = [];
-					var newProducts = _.sortBy(products, [function(o) { return o.date_created; }]).reverse().slice(0, 3);
-					var topProductSuggestion = _.filter(products, function(product) { return _.includes(product.tags, tags[0].name)}).slice(0, 3);
-					var secondProductSuggestion = _.filter(products, function(product) { return _.includes(product.tags, tags[1].name)}).slice(0, 3);
-					var thirdProductSuggestion = _.filter(products, function(product) { return _.includes(product.tags, tags[2].name)}).slice(0, 3);
-					productSuggestion.push(_.shuffle(newProducts));
-					productSuggestion.push(_.shuffle(topProductSuggestion));
-					productSuggestion.push(_.shuffle(secondProductSuggestion));
-					productSuggestion.push(_.shuffle(thirdProductSuggestion));
-					res.send(productSuggestion);
+					if(tags) {
+						var productSuggestion = [];
+						var newProducts = _.sortBy(products, [function(o) { return o.date_created; }]).reverse().slice(0, 3);
+						productSuggestion.push(_.shuffle(newProducts));
+
+						tags.forEach(function(tag) {
+							var productSection = _.filter(products, function(product) { return _.includes(product.tags, tag.name)}).slice(0, 3);
+							productSuggestion.push(_.shuffle(productSection));
+						});
+
+						res.send(productSuggestion);
+					}
 				});
 			});
 		});
@@ -333,8 +333,8 @@ var tallyUserProductTags = function(transactions, products, callback) {
 
 	var tagCount = {};
 
-	if(array.length < 1) {
-		callback(error);
+	if(transactions.length < 1) {
+		callback('No products available!');
 	}
 	transactions.forEach(function(transaction) {
 		transaction.products.forEach(function(product_id) {
@@ -364,7 +364,7 @@ var tallyUserProductTags = function(transactions, products, callback) {
 		}
 	}
 
-	callback(null, _.sortBy(transactionTags, ['count']).reverse());
+	callback(null, _.sortBy(transactionTags, ['count']).reverse().slice(0, 3));
 }
 
 var getUserTransactionHistory = function(info, callback) {
