@@ -308,10 +308,10 @@ app.get(path + '/productSuggestion', function(req, res) {
 					var topProductSuggestion = _.filter(products, function(product) { return _.includes(product.tags, tags[0].name)}).slice(0, 3);
 					var secondProductSuggestion = _.filter(products, function(product) { return _.includes(product.tags, tags[1].name)}).slice(0, 3);
 					var thirdProductSuggestion = _.filter(products, function(product) { return _.includes(product.tags, tags[2].name)}).slice(0, 3);
-					productSuggestion.push(newProducts);
-					productSuggestion.push(topProductSuggestion);
-					productSuggestion.push(secondProductSuggestion);
-					productSuggestion.push(thirdProductSuggestion);
+					productSuggestion.push(_.shuffle(newProducts));
+					productSuggestion.push(_.shuffle(topProductSuggestion));
+					productSuggestion.push(_.shuffle(secondProductSuggestion));
+					productSuggestion.push(_.shuffle(thirdProductSuggestion));
 					res.send(productSuggestion);
 				});
 			});
