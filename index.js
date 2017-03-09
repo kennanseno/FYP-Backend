@@ -334,7 +334,7 @@ var tallyUserProductTags = function(transactions, products, callback) {
 	var tagCount = {};
 
 	if(transactions.length < 1) {
-		callback('No products available!');
+		return callback('No products available!');
 	}
 	transactions.forEach(function(transaction) {
 		transaction.products.forEach(function(product_id) {
