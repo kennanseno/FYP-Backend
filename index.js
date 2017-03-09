@@ -303,30 +303,36 @@ app.get(path + '/productSuggestion', function(req, res) {
 		getUserTransactionHistory({ username: username, store_id: store_id }, function(transactions) {
 			getStoreProducts(store_id, function(products) {
 
-				var transactionTags = [];
-				transactions.forEach(function(transaction) {
-					transaction.products.forEach(function(product_id) {
-
-						//find product object with the product id
-						var productInTransaction = _.find(products, function(product) { return product._id == product_id });
+				var tagCount = {};
+ 				transactions.forEach(function(transaction) {
+ 					transaction.products.forEach(function(product_id) {
+ 
+ 						//find product object with the product id
+ 						var productInTransaction = _.find(products, function(product) { return product._id == product_id });
 
 						//tally tags in previous products bought
-						productInTransaction.tags.forEach(function(tag) {
-							transactionTags.forEach(function(transactionProductTag) {
-								if(_.includes(transactionProductTag, tag)) {
-									transactionProductTag.count += 1;
-								} else {
-									transactionTags.push({ name: tag, count: 1 })
-								}
-							});
-						});
-						
-					})
+ 						productInTransaction.tags.forEach(function(tag) {
+							var tagCountkeys = Object.keys(tagCount);
+							//check if tag is already in tags object
+							if(_.includes(tagCountkeys, tag)) {
+								tagCount[tag] = tagCount[tag] + 1;
+							} else {
+								tagCount[tag] = 1;
+							}
+						}); 
+					});
 				});
-				res.send(transactionTags);
+
+				var transactionTags = [];
+				for (var key in tagCount) {
+					// check also if property is not inherited from prototype
+					if (myObject.options.hasOwnProperty(key)) { 
+						var value = tagCount[key];
+						transactionTags.push({ name: key, count: value});
+					}
+				}
+				res.send(_.sortBy(transactionTag, ['count']).reverse());
 				var newProducts = _.sortBy(products, [function(o) { return o.date_created; }]).reverse();
-				//res.send(transactions);
-			});
 		});
 });
 
