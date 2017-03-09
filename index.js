@@ -310,10 +310,10 @@ app.get(path + '/productSuggestion', function(req, res) {
 						var productSuggestion = [];
 						var newProducts = _.sortBy(products, [function(o) { return o.date_created; }]).reverse().slice(0, 3);
 						productSuggestion.push(_.shuffle(newProducts));
-
+						productSuggestion.push([]);
 						tags.forEach(function(tag) {
 							var productSection = _.filter(products, function(product) { return _.includes(product.tags, tag.name)}).slice(0, 3);
-							productSuggestion.push(_.shuffle(productSection));
+							productSuggestion[1] = productSuggestion[1].concat(_.shuffle(productSection));
 						});
 
 						res.send(productSuggestion);
