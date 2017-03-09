@@ -302,7 +302,12 @@ app.get(path + '/productSuggestion', function(req, res) {
 
 		getUserTransactionHistory({ username: username, store_id: store_id }, function(transactions) {
 			getStoreProducts(store_id, function(products) {
-				tallyUserProductTags(transactions, products, function(tags) {
+				tallyUserProductTags(transactions, products, function(error, tags) {
+					if(error) {
+						res.send('Product Suggestion not Available!');
+						return;
+					}
+					
 					var productSuggestion = [];
 					var newProducts = _.sortBy(products, [function(o) { return o.date_created; }]).reverse().slice(0, 3);
 					var topProductSuggestion = _.filter(products, function(product) { return _.includes(product.tags, tags[0].name)}).slice(0, 3);
@@ -327,6 +332,10 @@ app.get(path + '/productSuggestion', function(req, res) {
 var tallyUserProductTags = function(transactions, products, callback) {
 
 	var tagCount = {};
+
+	if(array.length < 1) {
+		callback(error);
+	}
 	transactions.forEach(function(transaction) {
 		transaction.products.forEach(function(product_id) {
 
@@ -355,7 +364,7 @@ var tallyUserProductTags = function(transactions, products, callback) {
 		}
 	}
 
-	callback(_.sortBy(transactionTags, ['count']).reverse());
+	callback(null, _.sortBy(transactionTags, ['count']).reverse());
 }
 
 var getUserTransactionHistory = function(info, callback) {
