@@ -312,17 +312,14 @@ app.get(path + '/productSuggestion', function(req, res) {
 						productSuggestion.push(_.shuffle(newProducts));
 						productSuggestion.push([]);
 						tags.forEach(function(tag) {
-							var productSection = _.filter(products, function(product) {
-								//check if product is already in the suggestProductList
-								productSuggestion[1].forEach(function(suggestedProduct, index) {	
-									console.log("suggestedProduct:", suggestedProduct["_id"], "product:", product["_id"], "index:", index);
-									//console.log("Product suggestion List:", productSuggestion[1]);
-									if(suggestedProduct["_id"] == product["_id"]) {
-										return false;	
+							var productSection = _.filter(products, function(product) {	
+								checkIfProductAlreadySuggested(productSuggestion[1], product, function(alreadyExists, notExists) {
+									if(alreadyExists) {
+										return false;
+									}else if(notExists) {
+										return _.includes(product.tags, tag.name);
 									}
-								});
-
-								return _.includes(product.tags, tag.name);
+								})				
 							}).slice(0, 3);
 							productSuggestion[1] = productSuggestion[1].concat(_.shuffle(productSection));
 						});
@@ -334,8 +331,20 @@ app.get(path + '/productSuggestion', function(req, res) {
 		});
 });
 
-var productAlreadySuggested = function(productSuggestionList, product, callback) {
-
+/**
+ *  Check if product is already in the suggestion list
+ * @param {*Array} productSuggestionList 
+ * @param {*Object} product 
+ * @param {*Function} callback 
+ */
+var checkIfProductAlreadySuggested = function(productSuggestionList, product, callback) {
+	productSuggestionList.forEach(function(suggestedProduct, index) {	
+		console.log("suggestedProduct:", suggestedProduct["_id"], "product:", product["_id"], "index:", index);
+		if(suggestedProduct["_id"] == product["_id"]) {
+			return callback("already exists!");	
+		}
+	});
+	callback(null, true);
 }
 
 /**
