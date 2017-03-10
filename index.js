@@ -312,18 +312,7 @@ app.get(path + '/productSuggestion', function(req, res) {
 						productSuggestion.push(_.shuffle(newProducts));
 						productSuggestion.push([]);
 						tags.forEach(function(tag) {
-							var productSection = _.filter(products, function(product) {
-								//check if product is already in the suggestProductList
-								productSuggestion.forEach(function(suggestionSection) {
-									suggestionSection.forEach(function(suggestedProduct) {
-										if(suggestedProduct["_id"] === product["_id"]) {
-											return false;	
-										}
-									});
-								});	
-
-								return _.includes(product.tags, tag.name);
-							}).slice(0, 3);
+							var productSection = _.filter(products, function(product) { return _.includes(product.tags, tag.name)}).slice(0, 3);
 							productSuggestion[1] = productSuggestion[1].concat(_.shuffle(productSection));
 						});
 
@@ -333,10 +322,6 @@ app.get(path + '/productSuggestion', function(req, res) {
 			});
 		});
 });
-
-var productAlreadySuggested = function(productSuggestionList, product, callback) {
-
-}
 
 /**
  *  Tally most popular product tags based on users previous transactions
