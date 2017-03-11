@@ -179,34 +179,61 @@ app.post(path + '/addToCart', function(req, res) {
 	var params = {
 		'username': req.body.username
 	};
+	
 
 	findDocuments(database, collectionUsed, params, { 'cart': true }, function(doc) {
-		var productData = req.body.data;
-		var data;
+		var productData = req.body.data,
+			singleProduct = _.isString(productData.product_id),
+			data = {};
 
 		if(_.keys(doc[0].cart).length > 0) {
-			data = { 
-				$addToSet: { 
-					'cart.products' : {
-						product_id: productData.product_id,
-						quantity: productData.quantity
+			if(singleProduct) {
+				data = { 
+					$addToSet: { 
+						'cart.products' : {
+							product_id: productData.product_id,
+							quantity: productData.quantity
+						}
+					}
+				}
+			} else { 
+				var multipleProducts = _.map(productData.product_id, function(id) { return {product_id: id, quantity: productData.quantity} });
+				data = { 
+					$addToSet: { 
+						'cart.products' : {
+							$each: multipleProducts
+						}
 					}
 				}
 			}
+
 		} else {
-			//if no product exist in cart
-			data = { 
-				$set: { 
-					'cart' : {
-						store_id: productData.store_id,
-						products: [{
-							product_id: productData.product_id,
-							quantity: productData.quantity
-						}]
+			if(singleProduct) {
+				//if no product exist in cart
+				data = { 
+					$set: { 
+						'cart' : {
+							store_id: productData.store_id,
+							products: [{
+								product_id: productData.product_id,
+								quantity: productData.quantity
+							}]
+						}
+					}
+				}
+			} else {
+				var multipleProducts = _.map(productData.product_id, function(id) { return {product_id: id, quantity: productData.quantity} });
+				data = { 
+					$set: { 
+						'cart' : {
+							store_id: productData.store_id,
+							products: multipleProducts
+						}
 					}
 				}
 			}
 		}
+		console.log('DATA:', data);
 		updateDocuments(database, collectionUsed, params, data, function(result) {
 			res.send(result.result)
 		});
