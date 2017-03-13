@@ -339,7 +339,8 @@ app.get(path + '/productSuggestion', function(req, res) {
 						productSuggestion.push(_.shuffle(newProducts));
 						productSuggestion.push([]);
 						tags.forEach(function(tag) {
-							var productSection = _.filter(products, function(product) { return _.includes(product.tags, tag.name)}).slice(0, 3);
+							var suggestedProductId = _.map(productSuggestion[1], '_id');
+							var productSection = _.filter(products, function(product) { return _.includes(product.tags, tag.name) && !_.includes(suggestedProductId, product._id)}).slice(0, 3);
 							productSuggestion[1] = productSuggestion[1].concat(_.shuffle(productSection));
 						});
 
