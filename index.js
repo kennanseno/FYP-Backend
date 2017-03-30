@@ -51,6 +51,20 @@ app.get(path + '/findUser', function(req, res) {
 	});
 });
 
+app.post(path + '/updateUserInfo', function(req, res) {
+	var fieldName = req.body.fieldName,
+		fieldValue = req.body.fieldValue,
+		params = { username: req.body.username },
+		data = { 
+			$push: { 
+				fieldName : fieldValue
+			}
+		};
+	updateDocuments(database, collectionUsed, params, data, function(result) {
+		res.send(result.result)
+	});
+});
+
 app.get(path + '/getStore', function(req, res) {
 	var data = {
 		username: req.query.username
@@ -358,15 +372,12 @@ app.get(path + '/productSuggestion', function(req, res) {
  * @param {*} callback 
  */
 var tallyUserProductTags = function(transactions, products, callback) {
-
 	var tagCount = {};
-
 	if(transactions.length < 1) {
 		return callback('No products available!');
 	}
 	transactions.forEach(function(transaction) {
 		transaction.products.forEach(function(product_id) {
-
 			//find product object with the product id
 			var productInTransaction = _.find(products, function(product) { return product._id == product_id });
 
@@ -434,9 +445,6 @@ app.post(path + '/pay', function(req, res) {
 				cvc: _.toString(req.body.card.cvc)
 			}
 		};
-		console.log('store_id:', store_id);
-		console.log('data:', data);
-		console.log('card:', data.card);
 
 	var params = [
 		{ $unwind: '$stores' },
