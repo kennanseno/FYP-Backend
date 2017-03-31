@@ -55,13 +55,17 @@ app.post(path + '/updateUserInfo', function(req, res) {
 	var fieldName = req.body.fieldName,
 		fieldValue = req.body.fieldValue,
 		params = { username: req.body.username },
-		data = { 
-			$push: { 
-				fieldName : fieldValue
-			}
-		};
+		field = {};
+	
+	field[fieldName] = fieldValue;
+	var data = {
+		$set: field
+	}; 
+
+		console.log('params:', params, 'data:', data);
 	updateDocuments(database, collectionUsed, params, data, function(result) {
-		res.send(result.result)
+		console.log(result.result);
+		res.send(result.result);
 	});
 });
 
