@@ -111,7 +111,7 @@ app.post(path + '/updateStoreDetails', function(req, res) {
 	var data = { 
 		$set: field
 	};
-	console.log('params:', params, 'data:', data);
+
 	updateDocuments(database, collectionUsed, params, data, function(result) {
 		res.send(result.result)
 	});
@@ -207,6 +207,24 @@ app.post(path + '/addProduct', function(req, res) {
 				'price': productData.price,
 				'tags': productData.tags
 			} 
+		}
+	};
+
+	updateDocuments(database, collectionUsed, params, data, function(result) {
+		res.send(result.result)
+	});
+});
+
+app.post(path + '/addProduct', function(req, res) {
+	var params = {
+		'stores.id': ObjectId(req.body.store_id)
+	},
+	productId = req.body.product_id,
+	data = { 
+		$pull: { 
+			'stores.$.products' : {
+				'_id': productId
+			}
 		}
 	};
 
