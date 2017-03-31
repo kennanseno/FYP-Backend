@@ -62,19 +62,21 @@ app.post(path + '/updateUserInfo', function(req, res) {
 		$set: field
 	}; 
 
-		console.log('params:', params, 'data:', data);
 	updateDocuments(database, collectionUsed, params, data, function(result) {
-		console.log(result.result);
 		res.send(result.result);
 	});
 });
 
-app.get(path + '/getStore', function(req, res) {
+app.get(path + '/getUser', function(req, res) {
 	var data = {
 		username: req.query.username
 	};
 	
 	var params = {
+		username: true,
+		email: true,
+		name: true,
+		address: true,
 		stores: true
 	};
 
