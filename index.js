@@ -215,7 +215,7 @@ app.post(path + '/addProduct', function(req, res) {
 	});
 });
 
-app.post(path + '/addProduct', function(req, res) {
+app.post(path + '/removeProduct', function(req, res) {
 	var params = {
 		'stores.id': ObjectId(req.body.store_id)
 	},
