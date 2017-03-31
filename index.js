@@ -94,9 +94,30 @@ app.get(path + '/getStoreDetails', function(req, res) {
 	];
 
 	aggregate(database, collectionUsed, params, function(docs) {
-		res.send(docs);	
+		res.send(docs);
 	});
 });
+
+app.post(path + '/updateStoreDetails', function(req, res) {
+	var params = {
+		'stores.id': ObjectId(req.body.store_id)
+	},
+	fieldName = req.body.field_name,
+	fieldValue = req.body.field_value,
+	field = {};
+
+	field[fieldName] = fieldValue;
+	var data = { 
+		$push: { 
+			stores : field
+		}
+	};
+
+	updateDocuments(database, collectionUsed, params, data, function(result) {
+		res.send(result.result)
+	});
+});
+
 
 app.get(path + '/searchNearbyStores', function(req, res) {
 	var lat = geolib.useDecimal(req.query.latitude),
