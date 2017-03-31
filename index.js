@@ -117,6 +117,21 @@ app.post(path + '/updateStoreDetails', function(req, res) {
 	});
 });
 
+app.post(path + '/deleteStore', function(req, res) {
+	var params = {
+		'username': req.body.username
+	},
+	storeId = req.body.store_id,
+	data = { 
+		$pull: { 
+			'stores.$.id' : storeId
+		}
+	};
+
+	updateDocuments(database, collectionUsed, params, data, function(result) {
+		res.send(result.result)
+	});
+});
 
 app.get(path + '/searchNearbyStores', function(req, res) {
 	var lat = geolib.useDecimal(req.query.latitude),
