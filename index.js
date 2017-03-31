@@ -102,15 +102,14 @@ app.post(path + '/updateStoreDetails', function(req, res) {
 	var params = {
 		'stores.id': ObjectId(req.body.store_id)
 	},
-	fieldName = req.body.field_name,
+	fieldName = 'stores.',
 	fieldValue = req.body.field_value,
 	field = {};
 
+	fieldName.concat(req.body.field_name); //concat field name
 	field[fieldName] = fieldValue;
 	var data = { 
-		$push: { 
-			stores : field
-		}
+		$push: field
 	};
 
 	updateDocuments(database, collectionUsed, params, data, function(result) {
