@@ -125,12 +125,12 @@ app.post(path + '/deleteStore', function(req, res) {
 	},
 	data = { 
 		$pull: { 
-			'stores.$.id' : storeId
+			'stores' : {
+				id: storeId
+			}
 		}
 	};
-	console.log('params:', params, 'data:', data);
 	updateDocuments(database, collectionUsed, params, data, function(result) {
-		console.log(result.result);
 		res.send(result.result);
 	});
 });
