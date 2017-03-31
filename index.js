@@ -118,18 +118,20 @@ app.post(path + '/updateStoreDetails', function(req, res) {
 });
 
 app.post(path + '/deleteStore', function(req, res) {
-	var params = {
-		'username': req.body.username
+	var storeId = ObjectId(req.body.store_id),
+	params = {
+		username: req.body.username,
+		'stores.id': storeId
 	},
-	storeId = req.body.store_id,
 	data = { 
 		$pull: { 
 			'stores.$.id' : storeId
 		}
 	};
-
+	console.log('params:', params, 'data:', data);
 	updateDocuments(database, collectionUsed, params, data, function(result) {
-		res.send(result.result)
+		console.log(result.result);
+		res.send(result.result);
 	});
 });
 
