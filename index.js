@@ -664,6 +664,24 @@ app.get(path + '/test/testData', function(req, res) {
 	});
 });
 
+app.post(path + '/test/deleteStoreByName', function(req, res) {
+	var storeName = ObjectId(req.body.store_name),
+	params = {
+		username: req.body.username,
+		'stores.name': storeName
+	},
+	data = { 
+		$pull: { 
+			'stores' : {
+				name: storeName
+			}
+		}
+	};
+	updateDocuments(database, collectionUsed, params, data, function(result) {
+		res.send(result.result);
+	});
+});
+
 app.get(path + '/test/insertTestUser', function(req, res) {
 	var testUser = {
 		username: 'test',
