@@ -645,7 +645,7 @@ app.get(path + '/getTransactionHistory', function(req, res) {
 	var username = req.query.username;
 
 	getUserTransactionHistory({username: username}, function(transactions) {
-		res.send(transactions);
+		res.send(transactions.reverse()); //newest transaction first
 	})
 });
 
