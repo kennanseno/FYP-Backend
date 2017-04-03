@@ -642,6 +642,14 @@ var removeFromCart = function(username, data) {
 	}
 };
 
+app.get(path + '/getTransactionHistory', function(req, res) {
+	var username = req.query.username;
+
+	getUserTransactionHistory({username: username}, function(transactions) {
+		res.send(transactions);
+	})
+});
+
 /* ------------ TEST CODE -------------------- */
 
 app.get(path + '/test/testData', function(req, res) {
