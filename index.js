@@ -589,9 +589,8 @@ var simplifyPayment = function(key, data, callback) {
 		if(successData) {
 			saveTransaction(data);
 			removeFromCart(username, 'ALL');
+			callback(null, successData);
 		}
-
-		callback(null, successData);
 	})
 };
 
@@ -664,10 +663,10 @@ app.get(path + '/test/testData', function(req, res) {
 	});
 });
 
-app.post(path + '/test/deleteStoreByName', function(req, res) {
-	var storeName = ObjectId(req.body.store_name),
+app.get(path + '/test/deleteStoreByName', function(req, res) {
+	var storeName = req.query.store_name,
 	params = {
-		username: req.body.username,
+		username: req.query.username,
 		'stores.name': storeName
 	},
 	data = { 
