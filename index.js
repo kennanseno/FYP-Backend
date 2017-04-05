@@ -658,12 +658,14 @@ app.get(path + '/getTransactionHistory', function(req, res) {
 	var username = req.query.username;
 
 	getUserTransactionHistory({username: username}, function(transactions) {
-		transactions.forEach(transaction, function(transaction, index) {
-			getStoreName(transaction.store_id, function(storeName) {
-				transactions[index].store_id = storeName;
+		transactions.forEach(function(transaction, index) {
+			getStoreName(transaction.store_id, function(doc) {
+				transactions[index].store_id = doc[0].storeName;
+				if(index == transactions.length - 1) {
+					res.send(transactions.reverse()); //newest transaction first
+				}
 			})
 		})
-		res.send(transactions.reverse()); //newest transaction first
 	})
 });
 
