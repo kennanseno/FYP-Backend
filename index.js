@@ -594,6 +594,19 @@ var simplifyPayment = function(key, data, callback) {
 	})
 };
 
+var getStoreName = function(storeId, callback) {
+	
+	var params = [
+		{ $unwind: '$stores' },
+		{ $match: {'stores.id': ObjectId(storeId)} },
+		{ $project: {'storeName': '$stores.name'} }
+	];
+
+	aggregate(database, collectionUsed, params, function(docs) {
+		callback(docs);
+	});
+}
+
 var saveTransaction = function(data) {
 	var transactionData = {
 		username: data.username,
@@ -645,6 +658,11 @@ app.get(path + '/getTransactionHistory', function(req, res) {
 	var username = req.query.username;
 
 	getUserTransactionHistory({username: username}, function(transactions) {
+		transactions.forEach(transaction, function(transaction, index) {
+			getStoreName(transaction.store_id, function(storeName) {
+				transactions[index].store_id = storeName;
+			})
+		})
 		res.send(transactions.reverse()); //newest transaction first
 	})
 });
